@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 
 import static conopot.server.config.BaseResponseStatus.*;
 
@@ -30,6 +32,22 @@ public class CrawlingService {
     public CrawlingService(FileService fileService) {
         this.fileService = fileService;
         this.filePath = new FilePath();
+    }
+
+    /**
+     * 이번에 새롭게 추가된 최신곡들 저장
+     */
+    public void crawlingLatest() throws BaseException, IOException{
+        ArrayList<Music> latestTJ = savedLatestTJ();
+        ArrayList<Music> latestKY = savedLatestKY();
+    }
+
+    /**
+     * 인기차트 크롤링 및 저장
+     */
+    public void crawlingFamous() throws BaseException, IOException{
+        savedFamousTJ();
+        savedFamousKY();
     }
 
     /**
@@ -218,6 +236,136 @@ public class CrawlingService {
         }
     }
 
+    /**
+     * TJ 인기차트 크롤링 및 저장
+     * @throws BaseException
+     * @throws IOException
+     */
+    public void savedFamousTJ() throws BaseException, IOException {
+
+        ArrayList<Music> famousTJ = new ArrayList<>();
+
+        // 하루 전 기준 크롤링
+
+        Date now = new Date();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(now);
+
+        cal.add(Calendar.DAY_OF_MONTH, -1); // 1일 빼기
+
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH ) + 1;
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+
+        log.info("TJ Famous Date : {}/{}/{}", year, month, day);
+
+        String url = "http://tjmedia.com/tjsong/song_monthPopular.asp?strType=1&SYY=" + year + "&SMM=" + month + "&SDD=" + day + "&EYY=" + year + "&EMM=" + month + "&EDD=" + day;
+
+        Connection conn = Jsoup.connect(url);
+
+        try {
+            Document document = conn.get();
+            Elements elements = document.select("td");
+
+            int cnt = 0, id = 0; String name = "", singer = "", num = "";
+            for (Element element : elements) {
+                String txt = element.text();
+                if(txt.equals("")) continue;
+                else {
+                    if(cnt == 0) { // 순위는 필요 없음
+                        cnt++;
+                        continue;
+                    }
+                    else if(cnt == 1) { // 곡 번호
+                        num = txt;
+                        cnt++;
+                    }
+                    else if(cnt == 2) { // 곡 제목
+                        name = txt;
+                        cnt++;
+                    }
+                    else if(cnt == 3) { // 가수
+                        singer = txt;
+
+                        famousTJ.add(new Music(name, singer, num));
+
+                        cnt = 0;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new BaseException(CRAWL_FAMOUS_TJ_ERROR);
+        }
+
+        savedTxt(famousTJ, filePath.CHART_TJ);
+    }
+
+
+    /**
+     * KY 인기차트 크롤링 및 저장
+     * @throws BaseException
+     * @throws IOException
+     */
+    public void savedFamousKY() throws BaseException, IOException{
+
+        ArrayList<Music> musicBookKY = fileService.getMusicBookKY();
+        ArrayList<Music> famousKY = new ArrayList<>();
+
+        for(int i=1; i<=2; i++){
+
+            String url = "https://kysing.kr/popular/?period=&range=" + i;
+
+            Connection conn = Jsoup.connect(url);
+
+            try {
+                Document document = conn.get();
+
+                // 더 이상 없는 페이지인지 확인
+                Elements elements = document.select("div[class=popular_daily_chart_wrap] li");
+
+                int cnt = 0, id = 0, row = 0;
+                for (Element element : elements) {
+
+                    String text = element.text();
+
+                    // 1 : 곡번호만 크롤링
+                    if(cnt == 1){
+                        cnt++;
+                        if(row == 0) continue;
+                        else{
+                            for(Music music : musicBookKY) {
+                                if(music.getNumber().equals(text)){
+                                    famousKY.add(music);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        cnt++;
+                        if(cnt == 11){
+                            cnt = 0;
+                            row++;
+                            if(row == 51) break;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                throw new BaseException(CRAWL_FAMOUS_KY_ERROR);
+            }
+        }
+
+        savedTxt(famousKY, filePath.CHART_KY);
+    }
+
+    /**
+     * Text File 저장
+     * @param arr
+     * @param path
+     * @throws BaseException
+     * @throws IOException
+     */
     public void savedTxt(ArrayList<Music> arr, String path) throws BaseException, IOException {
         try{
             String output = "";
@@ -228,15 +376,5 @@ public class CrawlingService {
         } catch (BaseException e) {
             throw new BaseException(e.getStatus());
         }
-    }
-
-    // main run
-    public void crawlingLatest() throws BaseException, IOException{
-
-        // 이번에 새롭게 추가된 최신곡들 저장
-        ArrayList<Music> latestTJ = savedLatestTJ();
-        ArrayList<Music> latestKY = savedLatestKY();
-
-
     }
 }
