@@ -196,7 +196,7 @@ public class FileRepository {
      * @param path
      * @return
      */
-    public ArrayList<Highest> getHighest(String path){
+    public ArrayList<Highest> getHighest(String path) throws BaseException{
 
         ArrayList<Highest> ret = new ArrayList<>();
 
@@ -252,9 +252,9 @@ public class FileRepository {
             file_reader.close();
 
         } catch (FileNotFoundException e) {
-            e.getStackTrace();
+            throw new BaseException(FILE_NOTFOUND_ERROR);
         } catch(IOException e){
-            e.getStackTrace();
+            throw new BaseException(FILE_INPUT_ERROR);
         }
 
         log.info("Highest Size : {}", ret.size());
@@ -268,7 +268,14 @@ public class FileRepository {
      * @param path
      * @throws IOException
      */
-    public void makeText(String output, String path) throws BaseException, IOException{
+    public void savedText(String output, String path) throws BaseException, IOException{
+
+        // 이미 파일이 존재하면 삭제하기
+        File oldFile = new File(path);
+        if(oldFile.exists()) {
+            oldFile.delete();
+        }
+
         // 파일 출력
         BufferedOutputStream bs = null;
         try {

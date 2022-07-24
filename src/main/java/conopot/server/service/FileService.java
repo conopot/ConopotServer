@@ -10,8 +10,11 @@ import conopot.server.repository.FileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
+
+import static conopot.server.config.BaseResponseStatus.RESPONSE_ERROR;
 
 
 @Service
@@ -39,7 +42,7 @@ public class FileService {
             ArrayList<MatchingMusic> matchingMusics = fileRepository.getMatchingMusics(filePath.MATCHING_MUSICS);
             Map<String, String> matchingSingers = fileRepository.getMatchingSingers(filePath.MATCHING_SINGERS);
         } catch (Exception e) {
-            throw new BaseException(BaseResponseStatus.RESPONSE_ERROR);
+            throw new BaseException(RESPONSE_ERROR);
         }
     }
 
@@ -47,8 +50,8 @@ public class FileService {
     public ArrayList<Music> getMusicBookTJ() throws BaseException{
         try{
             return fileRepository.getMusicBook(filePath.MUSIC_BOOK_TJ);
-        } catch (Exception e) {
-            throw new BaseException(BaseResponseStatus.RESPONSE_ERROR);
+        } catch (BaseException e) {
+            throw new BaseException(e.getStatus());
         }
     }
 
@@ -56,8 +59,8 @@ public class FileService {
     public ArrayList<Music> getMusicBookKY() throws BaseException{
         try{
             return fileRepository.getMusicBook(filePath.MUSIC_BOOK_KY);
-        } catch (Exception e) {
-            throw new BaseException(BaseResponseStatus.RESPONSE_ERROR);
+        } catch (BaseException e) {
+            throw new BaseException(e.getStatus());
         }
     }
 
@@ -65,8 +68,8 @@ public class FileService {
     public ArrayList<Music> getLegend() throws BaseException {
         try{
             return fileRepository.getMusicBook(filePath.ALL_TIME_LEGEND);
-        } catch (Exception e) {
-            throw new BaseException(BaseResponseStatus.RESPONSE_ERROR);
+        } catch (BaseException e) {
+            throw new BaseException(e.getStatus());
         }
     }
 
@@ -74,8 +77,8 @@ public class FileService {
     public ArrayList<Highest> getHighest() throws BaseException {
         try{
             return fileRepository.getHighest(filePath.MUSIC_HIGHEST_KEY);
-        } catch (Exception e) {
-            throw new BaseException(BaseResponseStatus.RESPONSE_ERROR);
+        } catch (BaseException e) {
+            throw new BaseException(e.getStatus());
         }
     }
 
@@ -83,8 +86,8 @@ public class FileService {
     public ArrayList<MatchingMusic> getMatchingMusics() throws BaseException {
         try{
             return fileRepository.getMatchingMusics(filePath.MATCHING_MUSICS);
-        } catch (Exception e) {
-            throw new BaseException(BaseResponseStatus.RESPONSE_ERROR);
+        } catch (BaseException e) {
+            throw new BaseException(e.getStatus());
         }
     }
 
@@ -92,8 +95,16 @@ public class FileService {
     public Map<String, String> getMatchingSingers() throws BaseException {
         try{
             return fileRepository.getMatchingSingers(filePath.MATCHING_SINGERS);
-        } catch (Exception e) {
-            throw new BaseException(BaseResponseStatus.RESPONSE_ERROR);
+        } catch (BaseException e) {
+            throw new BaseException(e.getStatus());
+        }
+    }
+
+    public void savedText(String output, String path) throws BaseException, IOException {
+        try{
+            fileRepository.savedText(output, path);
+        } catch (BaseException e) {
+            throw new BaseException(e.getStatus());
         }
     }
 }

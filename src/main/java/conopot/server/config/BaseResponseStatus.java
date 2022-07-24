@@ -33,8 +33,15 @@ public enum BaseResponseStatus {
      */
     FILE_NOTFOUND_ERROR(false, 5000, "해당 경로에 파일이 존재하지 않습니다."),
     FILE_INPUT_ERROR(false, 5001, "파일을 불러오는데 실패하였습니다."),
-    FILE_OUTPUT_ERROR(false, 5002, "파일을 내보내는데 실패하였습니다.");
+    FILE_OUTPUT_ERROR(false, 5002, "파일을 내보내는데 실패하였습니다."),
 
+
+    /**
+     * 6000 : Crawling 오류
+     */
+    CRAWL_ERROR(false, 6000, "크롤링 작업에 실패하였습니다."),
+    CRAWL_LATEST_TJ_ERROR(false, 6001, "TJ 신곡을 크롤링 하는데 실패하였습니다."),
+    CRAWL_LATEST_KY_ERROR(false, 6002, "KY 신곡을 크롤링 하는데 실패하였습니다.");
 
 
     private final boolean isSuccess;
