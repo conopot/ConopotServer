@@ -3,6 +3,7 @@ package conopot.server.service;
 import conopot.server.config.BaseException;
 import conopot.server.config.FilePath;
 import conopot.server.dto.Music;
+import conopot.server.repository.LyricsRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -24,13 +25,15 @@ import static conopot.server.config.BaseResponseStatus.*;
 public class CrawlingService {
 
     private final FileService fileService;
+    private final LyricsRepository lyricsRepository;
     private FilePath filePath;
     boolean checkTJ[] = new boolean[100001];
     boolean checkKY[] = new boolean[100001];
 
     @Autowired
-    public CrawlingService(FileService fileService) {
+    public CrawlingService(FileService fileService, LyricsRepository lyricsRepository) {
         this.fileService = fileService;
+        this.lyricsRepository = lyricsRepository;
         this.filePath = new FilePath();
     }
 
@@ -40,6 +43,9 @@ public class CrawlingService {
     public void crawlingLatest() throws BaseException, IOException{
         ArrayList<Music> latestTJ = savedLatestTJ();
         ArrayList<Music> latestKY = savedLatestKY();
+
+        // TJ 신곡에 대한 가사 크롤링
+        crawlingLyrics(latestTJ);
     }
 
     /**
@@ -48,6 +54,50 @@ public class CrawlingService {
     public void crawlingFamous() throws BaseException, IOException{
         savedFamousTJ();
         savedFamousKY();
+    }
+
+    /**
+     * TJ 신곡 가사 크롤링
+     */
+    public void crawlingLyrics(ArrayList<Music> latestTJ) throws BaseException{
+        try{
+            for(Music m : latestTJ) {
+                if(lyricsRepository.checkAlreadyLyricsTJ(m.getNumber()) > 0) continue; // 이미 크롤링 했다면 건너뛰기
+                crawlingLyricByNumberTJ(m.getNumber());
+            }
+        } catch (BaseException e){
+            throw new BaseException(e.getStatus());
+        }
+    }
+
+    /**
+     * TJ 한 곡에 대한 가사 크롤링
+     * @param number
+     * @return
+     */
+    public boolean crawlingLyricByNumberTJ(String number) throws BaseException{
+
+        String lyrics = "";
+
+        // crawling logic
+        Connection conn = Jsoup.connect("https://www.tjmedia.co.kr/2006_renew/ZillerGasaService/gasa_view2.asp?pro=" + number);
+
+        try {
+            Document document = conn.get();
+
+            Element element = document.select("pre").get(3);
+
+            lyrics = element.text();
+
+        } catch (Exception e) {
+            return false; // TJ는 가사가 없는 것들도 있기 때문에 continue 해주어야 한다.
+            // throw new BaseException(CRAWL_LYRICS_TJ_ERROR);
+        }
+
+        // 결과값 DB에 저장하기
+        lyricsRepository.saveLyricsTJ(number, lyrics);
+
+        return true;
     }
 
     /**

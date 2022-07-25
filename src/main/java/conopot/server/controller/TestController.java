@@ -35,8 +35,8 @@ public class TestController{
     @GetMapping("/testCrawling")
     public BaseResponse<String> testCrawlingApi() throws IOException {
         try{
-            crawlingService.crawlingFamous();
             crawlingService.crawlingLatest();
+            crawlingService.crawlingFamous();
             return new BaseResponse<String>("PASS");
         } catch(BaseException e){
             return new BaseResponse<>(e.getStatus());
