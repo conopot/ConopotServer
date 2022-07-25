@@ -100,11 +100,48 @@ public class FileService {
         }
     }
 
+    // TJ 매칭 안 된 곡들
+    public ArrayList<Music> getNonMatchingTJ() throws BaseException {
+        try{
+            return fileRepository.getMusicBook(filePath.NON_MATCHING_TJ);
+        } catch (BaseException e) {
+            throw new BaseException(e.getStatus());
+        }
+    }
+
+    // KY 매칭 안 된 곡들
+    public ArrayList<Music> getNonMatchingKY() throws BaseException {
+        try{
+            return fileRepository.getMusicBook(filePath.NON_MATCHING_KY);
+        } catch (BaseException e) {
+            throw new BaseException(e.getStatus());
+        }
+    }
+
+    // 텍스트 파일 저장
     public void savedText(String output, String path) throws BaseException, IOException {
         try{
             fileRepository.savedText(output, path);
         } catch (BaseException e) {
             throw new BaseException(e.getStatus());
         }
+    }
+
+    // MatchingMusic 배열을 String으로
+    public String changeMatchingMusicArr(ArrayList<MatchingMusic> arr){
+        String output = "";
+        for(MatchingMusic m : arr) {
+            output = m.toString() + "\n";
+        }
+        return output;
+    }
+
+    // Music 배열을 String으로
+    public String changeMusicArr(ArrayList<Music> arr){
+        String output = "";
+        for(Music m : arr) {
+            output = m.toString() + "\n";
+        }
+        return output;
     }
 }

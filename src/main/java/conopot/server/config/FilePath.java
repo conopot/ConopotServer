@@ -18,5 +18,7 @@ public class FilePath {
      */
     public String MATCHING_SINGERS = "src/main/resources/static/Files/matchingSingers.txt";
     public String ALL_TIME_LEGEND = "src/main/resources/static/Files/AllTimeLegend.txt";
+    public String NON_MATCHING_TJ = "src/main/resources/static/Files/nonMatchingTJ.txt";
+    public String NON_MATCHING_KY = "src/main/resources/static/Files/nonMatchingKY.txt";
 
 }

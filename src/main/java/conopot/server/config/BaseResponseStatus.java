@@ -39,14 +39,15 @@ public enum BaseResponseStatus {
 
 
     /**
-     * 6000 : Crawling 오류
+     * 6000 : Crawling, Matching 오류
      */
     CRAWL_ERROR(false, 6000, "크롤링 작업에 실패하였습니다."),
     CRAWL_LATEST_TJ_ERROR(false, 6001, "TJ 신곡을 크롤링에 실패하였습니다."),
     CRAWL_LATEST_KY_ERROR(false, 6002, "KY 신곡을 크롤링에 실패하였습니다."),
     CRAWL_FAMOUS_TJ_ERROR(false, 6003, "TJ 인기차트 크롤링에 실패하였습니다."),
     CRAWL_FAMOUS_KY_ERROR(false, 6004, "KY 인기차트 크롤링에 실패하였습니다."),
-    CRAWL_LYRICS_TJ_ERROR(false, 6005, "TJ 가사 크롤링에 실패하였습니다.");
+    CRAWL_LYRICS_TJ_ERROR(false, 6005, "TJ 가사 크롤링에 실패하였습니다."),
+    MATCHING_ALGORITHM_ERROR(false, 6006, "TJ KY 알고리즘 매칭에 실패하였습니다.");
 
 
     private final boolean isSuccess;

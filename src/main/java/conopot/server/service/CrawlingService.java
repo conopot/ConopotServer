@@ -26,14 +26,15 @@ public class CrawlingService {
 
     private final FileService fileService;
     private final LyricsRepository lyricsRepository;
+    private final MatchingService matchingService;
     private FilePath filePath;
     boolean checkTJ[] = new boolean[100001];
     boolean checkKY[] = new boolean[100001];
 
-    @Autowired
-    public CrawlingService(FileService fileService, LyricsRepository lyricsRepository) {
+    public CrawlingService(FileService fileService, LyricsRepository lyricsRepository, MatchingService matchingService) {
         this.fileService = fileService;
         this.lyricsRepository = lyricsRepository;
+        this.matchingService = matchingService;
         this.filePath = new FilePath();
     }
 
@@ -46,6 +47,10 @@ public class CrawlingService {
 
         // TJ 신곡에 대한 가사 크롤링
         crawlingLyrics(latestTJ);
+
+        // 신곡 matching 하기
+        log.info("Matching Start!");
+        matchingService.matchingMusicByAlgorithm(latestTJ, latestKY);
     }
 
     /**
