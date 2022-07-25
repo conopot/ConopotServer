@@ -144,4 +144,13 @@ public class FileService {
         }
         return output;
     }
+
+    // zip 파일 생성
+    public void makeZip(String path) throws BaseException{
+        try{
+            fileRepository.makeZip(path);
+        } catch (BaseException e) {
+            throw new BaseException(e.getStatus());
+        }
+    }
 }

@@ -21,4 +21,9 @@ public class FilePath {
     public String NON_MATCHING_TJ = "src/main/resources/static/Files/nonMatchingTJ.txt";
     public String NON_MATCHING_KY = "src/main/resources/static/Files/nonMatchingKY.txt";
 
+    /**
+     * zip
+     */
+    public String ZIP_FILE = "/Users/taehyun/Project/ConopotServer/src/main/resources/static/MusicDB";
+
 }

@@ -2,6 +2,7 @@ package conopot.server.controller;
 
 import conopot.server.config.BaseException;
 import conopot.server.config.BaseResponse;
+import conopot.server.config.FilePath;
 import conopot.server.service.CrawlingService;
 import conopot.server.service.FileService;
 import conopot.server.service.MatchingService;
@@ -17,12 +18,14 @@ public class TestController{
     private final FileService fileService;
     private final CrawlingService crawlingService;
     private final MatchingService matchingService;
+    private FilePath filePath;
 
     @Autowired
     public TestController(FileService fileService, CrawlingService crawlingService, MatchingService matchingService) {
         this.fileService = fileService;
         this.crawlingService = crawlingService;
         this.matchingService = matchingService;
+        filePath = new FilePath();
     }
 
 
@@ -51,6 +54,16 @@ public class TestController{
     public BaseResponse<String> testMatchingApi() throws IOException {
         try{
             crawlingService.crawlingLatest(); // 이 안에 matching 들어감
+            return new BaseResponse<String>("PASS");
+        } catch(BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    @GetMapping("/testZip")
+    public BaseResponse<String> testZipApi() throws IOException {
+        try{
+            fileService.makeZip(filePath.ZIP_FILE);
             return new BaseResponse<String>("PASS");
         } catch(BaseException e){
             return new BaseResponse<>(e.getStatus());

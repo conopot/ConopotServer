@@ -36,6 +36,7 @@ public enum BaseResponseStatus {
     FILE_NOTFOUND_ERROR(false, 5000, "해당 경로에 파일이 존재하지 않습니다."),
     FILE_INPUT_ERROR(false, 5001, "파일을 불러오는데 실패하였습니다."),
     FILE_OUTPUT_ERROR(false, 5002, "파일을 내보내는데 실패하였습니다."),
+    FILE_ZIP_ERROR(false, 5003, "파일을 압축하는데 실패하였습니다."),
 
 
     /**

@@ -11,6 +11,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static conopot.server.config.BaseResponseStatus.*;
 
@@ -286,6 +288,57 @@ public class FileRepository {
             throw new BaseException(FILE_OUTPUT_ERROR);
         }finally {
             bs.close();
+        }
+    }
+
+    // zip 파일로 변환
+    public void makeZip(String path) throws BaseException{
+
+        // 이미 존재한다면, 삭제하기
+        File oldFile = new File(path + "/test.zip");
+        if(oldFile.exists()) {
+            oldFile.delete();
+        }
+
+        File file_ = new File(path);
+        File[] listFiles = file_.listFiles();
+
+        FileOutputStream fos = null;
+        ZipOutputStream zipOut = null;
+        FileInputStream fis = null;
+
+        try {
+
+            fos = new FileOutputStream(path + "/musics.zip");
+            zipOut = new ZipOutputStream(fos);
+
+            for(File fileToZip :  listFiles) {
+
+                fis = new FileInputStream(fileToZip);
+                ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
+                zipOut.putNextEntry(zipEntry);
+
+                byte[] bytes = new byte[1024];
+                int length;
+                while((length = fis.read(bytes)) >= 0) {
+                    zipOut.write(bytes, 0, length);
+                }
+
+                fis.close();
+                zipOut.closeEntry();
+
+            }
+
+            zipOut.close();
+            fos.close();
+
+        } catch (IOException e) {
+            throw new BaseException(FILE_ZIP_ERROR);
+        } finally {
+            try { if(fis != null)fis.close(); } catch (IOException e1) {log.info(e1.getMessage());/*ignore*/}
+            try { if(zipOut != null)zipOut.closeEntry();} catch (IOException e2) {log.info(e2.getMessage());/*ignore*/}
+            try { if(zipOut != null)zipOut.close();} catch (IOException e3) {log.info(e3.getMessage());/*ignore*/}
+            try { if(fos != null)fos.close(); } catch (IOException e4) {log.info(e4.getMessage());/*ignore*/}
         }
     }
 }
