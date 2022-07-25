@@ -131,7 +131,7 @@ public class FileService {
     public String changeMatchingMusicArr(ArrayList<MatchingMusic> arr){
         String output = "";
         for(MatchingMusic m : arr) {
-            output = m.toString() + "\n";
+            output += m.toString() + "\n";
         }
         return output;
     }
@@ -140,7 +140,7 @@ public class FileService {
     public String changeMusicArr(ArrayList<Music> arr){
         String output = "";
         for(Music m : arr) {
-            output = m.toString() + "\n";
+            output += m.toString() + "\n";
         }
         return output;
     }

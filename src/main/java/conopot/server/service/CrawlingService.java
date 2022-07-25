@@ -2,6 +2,7 @@ package conopot.server.service;
 
 import conopot.server.config.BaseException;
 import conopot.server.config.FilePath;
+import conopot.server.dto.MatchingMusic;
 import conopot.server.dto.Music;
 import conopot.server.repository.LyricsRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -246,11 +247,50 @@ public class CrawlingService {
             // .txt 파일 저장
             savedTxt(musicBookTJ, filePath.MUSIC_BOOK_TJ);
 
+            // matchingMusics에 신곡들 추가
+            addMatchingMusics(latestTJ);
+
             return latestTJ;
 
         } catch (BaseException e) {
             throw new BaseException(e.getStatus());
         }
+    }
+
+    public void addMatchingMusics(ArrayList<Music> latestTJ) throws BaseException, IOException{
+
+        // matchingMusics에 신곡 추가
+        ArrayList<MatchingMusic> matchingMusics = fileService.getMatchingMusics();
+        for(Music m : latestTJ) {
+            matchingMusics.add(new MatchingMusic(m, new Music("", "", "")));
+        }
+
+        // matchingMusics 번호 순 정렬
+        Collections.sort(matchingMusics);
+
+        // Legend 곡 들 앞으로 빼주기
+        // 인기곡 100곡 앞으로 정렬
+        ArrayList<Music> legend = fileService.getLegend();
+        ArrayList<MatchingMusic> temp = new ArrayList<>();
+
+        for(Music lm : legend) {
+            String lNum = lm.getNumber();
+            for(MatchingMusic m : matchingMusics) {
+                if(m.getTJ().getNumber().equals(lNum)) {
+                    temp.add(m);
+                    matchingMusics.remove(m);
+                    break;
+                }
+            }
+        }
+
+        for(MatchingMusic m : matchingMusics) {
+            temp.add(m);
+        }
+
+        matchingMusics = temp;
+
+        fileService.savedText(fileService.changeMatchingMusicArr(matchingMusics), filePath.MATCHING_MUSICS);
     }
 
     /**
