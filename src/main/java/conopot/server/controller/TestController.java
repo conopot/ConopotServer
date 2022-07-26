@@ -91,4 +91,14 @@ public class TestController{
             return new BaseResponse<>(e.getStatus());
         }
     }
+
+    @GetMapping("/testFileSize")
+    public BaseResponse<String> testFileSizeApi() throws Exception{
+        try{
+            String ret = fileService.checkFileSize() ? "PASS" : "FAIL";
+            return new BaseResponse<String>(ret);
+        } catch(BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
 }

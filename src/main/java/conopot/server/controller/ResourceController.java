@@ -32,7 +32,7 @@ public class ResourceController {
         this.mailService = mailService;
         this.filePath = new FilePath();
     }
-    
+
     @GetMapping("/music/update")
     public BaseResponse<String> updateMusic() throws Exception {
         try{

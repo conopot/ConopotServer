@@ -7,17 +7,21 @@ import conopot.server.dto.Highest;
 import conopot.server.dto.MatchingMusic;
 import conopot.server.dto.Music;
 import conopot.server.repository.FileRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Map;
 
-import static conopot.server.config.BaseResponseStatus.RESPONSE_ERROR;
+import static conopot.server.config.BaseResponseStatus.*;
 
 
-@Service
+@Service @Slf4j
 public class FileService {
 
     private final FileRepository fileRepository;
@@ -149,8 +153,25 @@ public class FileService {
     public void makeZip(String path) throws BaseException{
         try{
             fileRepository.makeZip(path);
+            if(!checkFileSize()) throw new BaseException(FILE_SIZE_ERROR);
         } catch (BaseException e) {
             throw new BaseException(e.getStatus());
+        }
+    }
+
+    /**
+     * fileSize가 3MB 이상이라면 true, 아니면 false 반환
+     * @return
+     * @throws BaseException
+     */
+    public boolean checkFileSize() throws BaseException{
+        try{
+            Path path = Paths.get(filePath.S3_ZIP_FILE);
+            long kb = Files.size(path) / 1024;
+            log.info("File Size : {}", kb);
+            return kb > 3*1024 ? true : false;
+        } catch(Exception e){
+            throw new BaseException(FILE_CHECK_SIZE_ERROR);
         }
     }
 }
