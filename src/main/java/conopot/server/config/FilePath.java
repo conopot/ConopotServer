@@ -25,5 +25,6 @@ public class FilePath {
      * zip
      */
     public String ZIP_FILE = "/Users/taehyun/Project/ConopotServer/src/main/resources/static/MusicDB";
+    public String S3_ZIP_FILE = "/Users/taehyun/Project/ConopotServer/src/main/resources/static/MusicDB/musics.zip";
 
 }

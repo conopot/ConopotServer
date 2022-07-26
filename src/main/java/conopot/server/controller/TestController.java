@@ -3,6 +3,7 @@ package conopot.server.controller;
 import conopot.server.config.BaseException;
 import conopot.server.config.BaseResponse;
 import conopot.server.config.FilePath;
+import conopot.server.service.AwsS3Service;
 import conopot.server.service.CrawlingService;
 import conopot.server.service.FileService;
 import conopot.server.service.MatchingService;
@@ -18,13 +19,15 @@ public class TestController{
     private final FileService fileService;
     private final CrawlingService crawlingService;
     private final MatchingService matchingService;
+    private final AwsS3Service awsS3Service;
     private FilePath filePath;
 
     @Autowired
-    public TestController(FileService fileService, CrawlingService crawlingService, MatchingService matchingService) {
+    public TestController(FileService fileService, CrawlingService crawlingService, MatchingService matchingService, AwsS3Service awsS3Service) {
         this.fileService = fileService;
         this.crawlingService = crawlingService;
         this.matchingService = matchingService;
+        this.awsS3Service = awsS3Service;
         filePath = new FilePath();
     }
 
@@ -61,9 +64,19 @@ public class TestController{
     }
 
     @GetMapping("/testZip")
-    public BaseResponse<String> testZipApi() throws IOException {
+    public BaseResponse<String> testZipApi() {
         try{
             fileService.makeZip(filePath.ZIP_FILE);
+            return new BaseResponse<String>("PASS");
+        } catch(BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    @GetMapping("/testS3")
+    public BaseResponse<String> testS3Api() throws Exception{
+        try{
+            awsS3Service.uploadZipFile();
             return new BaseResponse<String>("PASS");
         } catch(BaseException e){
             return new BaseResponse<>(e.getStatus());

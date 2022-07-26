@@ -37,6 +37,7 @@ public enum BaseResponseStatus {
     FILE_INPUT_ERROR(false, 5001, "파일을 불러오는데 실패하였습니다."),
     FILE_OUTPUT_ERROR(false, 5002, "파일을 내보내는데 실패하였습니다."),
     FILE_ZIP_ERROR(false, 5003, "파일을 압축하는데 실패하였습니다."),
+    FILE_S3_UPLOAD_ERROR(false, 5004, "S3에 파일을 업로드하는데 실패하였습니다."),
 
 
     /**
