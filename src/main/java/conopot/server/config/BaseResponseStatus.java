@@ -29,6 +29,7 @@ public enum BaseResponseStatus {
     SERVER_ERROR(false, 4001, "서버와의 연결에 실패하였습니다."),
     DATABASE_CHECK_ALREADY_ERROR(false, 4002, "이미 있는 데이터인지 확인하는데 실패하였습니다."),
     DATABASE_LYRICS_SAVED_ERROR(false, 4003, "가사를 저장하는데 실패하였습니다."),
+    MAIL_SEND_ERROR(false, 4004, "메일을 전송하는데 실패하였습니다."),
 
     /**
      * 5000 : File I/O 오류

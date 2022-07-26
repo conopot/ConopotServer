@@ -3,10 +3,7 @@ package conopot.server.controller;
 import conopot.server.config.BaseException;
 import conopot.server.config.BaseResponse;
 import conopot.server.config.FilePath;
-import conopot.server.service.AwsS3Service;
-import conopot.server.service.CrawlingService;
-import conopot.server.service.FileService;
-import conopot.server.service.MatchingService;
+import conopot.server.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,14 +17,16 @@ public class TestController{
     private final CrawlingService crawlingService;
     private final MatchingService matchingService;
     private final AwsS3Service awsS3Service;
+    private final MailService mailService;
     private FilePath filePath;
 
     @Autowired
-    public TestController(FileService fileService, CrawlingService crawlingService, MatchingService matchingService, AwsS3Service awsS3Service) {
+    public TestController(FileService fileService, CrawlingService crawlingService, MatchingService matchingService, AwsS3Service awsS3Service, MailService mailService) {
         this.fileService = fileService;
         this.crawlingService = crawlingService;
         this.matchingService = matchingService;
         this.awsS3Service = awsS3Service;
+        this.mailService = mailService;
         filePath = new FilePath();
     }
 
@@ -77,6 +76,16 @@ public class TestController{
     public BaseResponse<String> testS3Api() throws Exception{
         try{
             awsS3Service.uploadZipFile();
+            return new BaseResponse<String>("PASS");
+        } catch(BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    @GetMapping("/testMail")
+    public BaseResponse<String> testMailApi() throws Exception{
+        try{
+            mailService.mailSend();
             return new BaseResponse<String>("PASS");
         } catch(BaseException e){
             return new BaseResponse<>(e.getStatus());
