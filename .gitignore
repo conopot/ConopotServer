@@ -38,3 +38,4 @@ out/
 
 ### USER ###
 application.properties
+.DS_Store
