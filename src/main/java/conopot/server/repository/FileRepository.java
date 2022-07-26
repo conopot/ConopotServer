@@ -112,13 +112,7 @@ public class FileRepository {
                     } else if (cnt == 6) {
                         number = temp;
                         ky = new Music(name, singer, number);
-                    } else if(cnt == 7) {
-                        sex = temp;
-                    } else if(cnt == 8) {
-                        high = temp;
-                    } else if(cnt == 9) {
-                        numHigh = temp;
-                        ret.add(new MatchingMusic(tj, ky, sex, high, numHigh));
+                        ret.add(new MatchingMusic(tj, ky));
                         cnt = 0;
                     }
                     temp = "";
