@@ -1,3 +1,3 @@
-## ⚙️ Architecture
+# ⚙️ Architecture
 
-![ConpotServer ArchitectureV1](https://user-images.githubusercontent.com/65909160/181171401-b3d15ef6-b309-40a7-8fb2-bd18a5b196aa.png)
+<img width="1000" alt="스크린샷 2022-07-27 오후 2 56 33" src="https://user-images.githubusercontent.com/65909160/181171968-c856577d-8b07-4e53-b779-2faf9e0c659a.png">
