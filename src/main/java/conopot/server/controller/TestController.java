@@ -2,6 +2,7 @@ package conopot.server.controller;
 
 import conopot.server.config.BaseException;
 import conopot.server.config.BaseResponse;
+import conopot.server.config.BaseResponseStatus;
 import conopot.server.config.FilePath;
 import conopot.server.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+
+import static conopot.server.config.BaseResponseStatus.DOCKER_MAKE_IMAGE_ERROR;
 
 @RestController
 public class TestController{
@@ -100,5 +103,10 @@ public class TestController{
         } catch(BaseException e){
             return new BaseResponse<>(e.getStatus());
         }
+    }
+
+    @GetMapping("/testDocker")
+    public BaseResponse<String> testDockerApi(){
+        return new BaseResponse<String>("Docker를 정상적으로 실행했습니다.");
     }
 }
