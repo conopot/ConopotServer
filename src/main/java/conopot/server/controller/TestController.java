@@ -4,17 +4,20 @@ import conopot.server.config.BaseException;
 import conopot.server.config.BaseResponse;
 import conopot.server.config.BaseResponseStatus;
 import conopot.server.config.FilePath;
+import conopot.server.dto.Music;
 import conopot.server.repository.FileRepository;
 import conopot.server.service.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import static conopot.server.config.BaseResponseStatus.DOCKER_MAKE_IMAGE_ERROR;
 
-@RestController
+@RestController @Slf4j
 public class TestController{
 
     private final FileService fileService;
@@ -140,6 +143,18 @@ public class TestController{
         try{
             fileRepository.initData();
             return new BaseResponse<String>("Data를 불러오는데 성공했습니다.");
+        }
+        catch(BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    @GetMapping("/testStaticFile")
+    public BaseResponse<String> testStaticFile(){
+        try{
+            ArrayList<Music> musicBook = fileRepository.getMusicBook("resources/static/Files/AllTimeLegend.txt");
+            log.info("Music Book size : {}", musicBook.size());
+            return new BaseResponse<String>("내부 파일을 가져오는데 성공했습니다.");
         }
         catch(BaseException e){
             return new BaseResponse<>(e.getStatus());
