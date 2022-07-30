@@ -19,6 +19,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,8 +39,6 @@ public class FileRepository {
 
     public FileRepository() throws BaseException{
         this.filePath = new FilePath();
-        this.getZipFileFromS3();
-        this.unCompressZip();
     }
 
     /**
@@ -312,7 +311,7 @@ public class FileRepository {
     public void makeZip(String path) throws BaseException{
 
         // 이미 존재한다면, 삭제하기
-        File oldFile = new File(path + "/test.zip");
+        File oldFile = new File(path + "Musics.zip");
         if(oldFile.exists()) {
             oldFile.delete();
         }
@@ -326,7 +325,7 @@ public class FileRepository {
 
         try {
 
-            fos = new FileOutputStream(path + "/musics.zip");
+            fos = new FileOutputStream(path + "/Musics.zip");
             zipOut = new ZipOutputStream(fos);
 
             for(File fileToZip :  listFiles) {
@@ -359,10 +358,28 @@ public class FileRepository {
         }
     }
 
+    public void deleteOldFile(String path){
+        File oldFile = new File(path);
+        if(oldFile.exists()) {
+            oldFile.delete();
+        }
+    }
+
+    public void initData() throws BaseException{
+        try {
+            getZipFileFromS3();
+            unzipFile(filePath.S3_ZIP_FILE, filePath.ZIP_FILE);
+        } catch (BaseException e){
+            throw new BaseException(e.getStatus());
+        }
+    }
+
+    // cloudfront에서 zip file 다운로드
     public void getZipFileFromS3() throws BaseException{
         try{
             String OUTPUT_FILE_PATH = "src/main/resources/static/MusicDB/Musics.zip";
             String FILE_URL = cloudFrontUrl;
+            deleteOldFile(OUTPUT_FILE_PATH);
             try(InputStream in = new URL(FILE_URL).openStream()){
                 Path imagePath = Paths.get(OUTPUT_FILE_PATH);
                 Files.copy(in, imagePath);
@@ -373,36 +390,56 @@ public class FileRepository {
         }
     }
 
-    public void unCompressZip() throws BaseException{
-        String zipFolder = filePath.ZIP_FILE + "/";
+    public void unzipFile(String source, String target) throws BaseException {
 
-        try{
-            File zipFile = new File(zipFolder, "Musics.zip");
+        Path sourceZip = Paths.get(source);
+        Path targetDir = Paths.get(target);
 
-            try(BufferedInputStream in = new BufferedInputStream(new FileInputStream(zipFile))) {
-                try(ZipInputStream zipInputStream = new ZipInputStream(in)) {
-                    ZipEntry zipEntry = null;
+        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(sourceZip.toFile()))) {
 
-                    while((zipEntry = zipInputStream.getNextEntry()) != null) {
-                        int length = 0;
-                        try(BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(zipFolder + zipEntry.getName()))) {
-                            while((length = zipInputStream.read()) != -1) {
-                                out.write(length);
-                            }
-                            zipInputStream.closeEntry();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            throw new BaseException(FILE_UNZIP_ERROR);
+            // list files in zip
+            ZipEntry zipEntry = zis.getNextEntry();
+            while (zipEntry != null) {
+
+                boolean isDirectory = false;
+                if (zipEntry.getName().endsWith(File.separator)) {
+                    isDirectory = true;
+                }
+
+                Path newPath = zipSlipProtect(zipEntry, targetDir);
+                if (isDirectory) {
+                    Files.createDirectories(newPath);
+                } else {
+                    if (newPath.getParent() != null) {
+                        if (Files.notExists(newPath.getParent())) {
+                            Files.createDirectories(newPath.getParent());
                         }
                     }
+                    // copy files
+                    Files.copy(zis, newPath, StandardCopyOption.REPLACE_EXISTING);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new BaseException(FILE_UNZIP_ERROR);
+
+                zipEntry = zis.getNextEntry();
             }
-        } catch (Exception e) {
+            zis.closeEntry();
+        } catch (IOException e) {
             e.printStackTrace();
             throw new BaseException(FILE_UNZIP_ERROR);
         }
     }
+
+    public Path zipSlipProtect(ZipEntry zipEntry, Path targetDir) throws IOException {
+
+        // test zip slip vulnerability
+        Path targetDirResolved = targetDir.resolve(zipEntry.getName());
+
+        // make sure normalized file still has targetDir as its prefix
+        // else throws exception
+        Path normalizePath = targetDirResolved.normalize();
+        if (!normalizePath.startsWith(targetDir)) {
+            throw new IOException("Bad zip entry: " + zipEntry.getName());
+        }
+        return normalizePath;
+    }
+
 }

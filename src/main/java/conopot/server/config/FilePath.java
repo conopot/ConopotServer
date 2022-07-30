@@ -24,7 +24,7 @@ public class FilePath {
     /**
      * zip
      */
-    public String ZIP_FILE = "src/main/resources/static/MusicDB";
+    public String ZIP_FILE = "src/main/resources/static/MusicDB/";
     public String S3_ZIP_FILE = "src/main/resources/static/MusicDB/Musics.zip";
 
 }

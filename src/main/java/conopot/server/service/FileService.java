@@ -1,7 +1,6 @@
 package conopot.server.service;
 
 import conopot.server.config.BaseException;
-import conopot.server.config.BaseResponseStatus;
 import conopot.server.config.FilePath;
 import conopot.server.dto.Highest;
 import conopot.server.dto.MatchingMusic;
@@ -31,6 +30,15 @@ public class FileService {
     public FileService(FileRepository fileRepository) {
         this.fileRepository = fileRepository;
         this.filePath = new FilePath();
+    }
+
+    /**
+     * Cloud Front에서 zip 파일 다운로드
+     * 다운로드 받은 zip 파일 압축 해제
+     * @throws BaseException
+     */
+    public void initData() throws BaseException {
+        fileRepository.initData();
     }
 
     /**

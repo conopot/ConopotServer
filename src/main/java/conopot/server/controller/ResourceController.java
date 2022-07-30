@@ -36,6 +36,7 @@ public class ResourceController {
     @GetMapping("/music/update")
     public BaseResponse<String> updateMusic() throws Exception {
         try{
+            fileService.initData();
             crawlingService.crawlingLatest();
             crawlingService.crawlingFamous();
             fileService.makeZip(filePath.ZIP_FILE);

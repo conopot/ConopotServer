@@ -127,8 +127,19 @@ public class TestController{
     @GetMapping("/testUnZip")
     public BaseResponse<String> testUnZip(){
         try{
-            fileRepository.unCompressZip();
+            fileRepository.unzipFile(filePath.S3_ZIP_FILE, filePath.ZIP_FILE);
             return new BaseResponse<String>("zip 파일을 압축 해제하였습니다.");
+        }
+        catch(BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    @GetMapping("/testInitData")
+    public BaseResponse<String> testInitData(){
+        try{
+            fileRepository.initData();
+            return new BaseResponse<String>("Data를 불러오는데 성공했습니다.");
         }
         catch(BaseException e){
             return new BaseResponse<>(e.getStatus());
