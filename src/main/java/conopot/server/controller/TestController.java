@@ -123,4 +123,15 @@ public class TestController{
             return new BaseResponse<>(e.getStatus());
         }
     }
+
+    @GetMapping("/testUnZip")
+    public BaseResponse<String> testUnZip(){
+        try{
+            fileRepository.unCompressZip();
+            return new BaseResponse<String>("zip 파일을 압축 해제하였습니다.");
+        }
+        catch(BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
 }

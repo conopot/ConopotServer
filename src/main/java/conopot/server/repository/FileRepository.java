@@ -1,6 +1,7 @@
 package conopot.server.repository;
 
 import conopot.server.config.BaseException;
+import conopot.server.config.FilePath;
 import conopot.server.dto.Highest;
 import conopot.server.dto.MatchingMusic;
 import conopot.server.dto.Music;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import static conopot.server.config.BaseResponseStatus.*;
@@ -31,6 +33,14 @@ public class FileRepository {
 
     @Value("${url.cloudfront}")
     private String cloudFrontUrl;
+
+    private FilePath filePath;
+
+    public FileRepository() throws BaseException{
+        this.filePath = new FilePath();
+        this.getZipFileFromS3();
+        this.unCompressZip();
+    }
 
     /**
      * TJ, 금영 전체 곡 가져오기
@@ -360,6 +370,39 @@ public class FileRepository {
         } catch(Exception e){
             e.printStackTrace();
             throw new BaseException(FILE_CLOUDFRONT_DOWNLOAD_ERROR);
+        }
+    }
+
+    public void unCompressZip() throws BaseException{
+        String zipFolder = filePath.ZIP_FILE + "/";
+
+        try{
+            File zipFile = new File(zipFolder, "Musics.zip");
+
+            try(BufferedInputStream in = new BufferedInputStream(new FileInputStream(zipFile))) {
+                try(ZipInputStream zipInputStream = new ZipInputStream(in)) {
+                    ZipEntry zipEntry = null;
+
+                    while((zipEntry = zipInputStream.getNextEntry()) != null) {
+                        int length = 0;
+                        try(BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(zipFolder + zipEntry.getName()))) {
+                            while((length = zipInputStream.read()) != -1) {
+                                out.write(length);
+                            }
+                            zipInputStream.closeEntry();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            throw new BaseException(FILE_UNZIP_ERROR);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new BaseException(FILE_UNZIP_ERROR);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BaseException(FILE_UNZIP_ERROR);
         }
     }
 }
