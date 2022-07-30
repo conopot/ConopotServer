@@ -41,6 +41,7 @@ public enum BaseResponseStatus {
     FILE_S3_UPLOAD_ERROR(false, 5004, "S3에 파일을 업로드하는데 실패하였습니다."),
     FILE_CHECK_SIZE_ERROR(false, 5005, "파일 사이즈를 체크하는데 실패하였습니다."),
     FILE_SIZE_ERROR(false, 5006, "파일 사이즈가 적정 기준을 만족하지 못했습니다."),
+    FILE_CLOUDFRONT_DOWNLOAD_ERROR(false, 5007, "Cloud Front로부터 파일을 다운로드하는데 실패하였습니다."),
 
 
     /**

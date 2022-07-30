@@ -5,9 +5,19 @@ import conopot.server.dto.Highest;
 import conopot.server.dto.MatchingMusic;
 import conopot.server.dto.Music;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +28,9 @@ import static conopot.server.config.BaseResponseStatus.*;
 
 @Repository @Slf4j
 public class FileRepository {
+
+    @Value("${url.cloudfront}")
+    private String cloudFrontUrl;
 
     /**
      * TJ, 금영 전체 곡 가져오기
@@ -333,6 +346,20 @@ public class FileRepository {
             try { if(zipOut != null)zipOut.closeEntry();} catch (IOException e2) {log.info(e2.getMessage());/*ignore*/}
             try { if(zipOut != null)zipOut.close();} catch (IOException e3) {log.info(e3.getMessage());/*ignore*/}
             try { if(fos != null)fos.close(); } catch (IOException e4) {log.info(e4.getMessage());/*ignore*/}
+        }
+    }
+
+    public void getZipFileFromS3() throws BaseException{
+        try{
+            String OUTPUT_FILE_PATH = "src/main/resources/static/MusicDB/Musics.zip";
+            String FILE_URL = cloudFrontUrl;
+            try(InputStream in = new URL(FILE_URL).openStream()){
+                Path imagePath = Paths.get(OUTPUT_FILE_PATH);
+                Files.copy(in, imagePath);
+            }
+        } catch(Exception e){
+            e.printStackTrace();
+            throw new BaseException(FILE_CLOUDFRONT_DOWNLOAD_ERROR);
         }
     }
 }
