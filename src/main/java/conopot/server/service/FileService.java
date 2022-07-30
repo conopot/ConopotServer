@@ -45,8 +45,8 @@ public class FileService {
             ArrayList<Highest> highest = fileRepository.getHighest(filePath.MUSIC_HIGHEST_KEY);
             ArrayList<MatchingMusic> matchingMusics = fileRepository.getMatchingMusics(filePath.MATCHING_MUSICS);
             Map<String, String> matchingSingers = fileRepository.getMatchingSingers(filePath.MATCHING_SINGERS);
-        } catch (Exception e) {
-            throw new BaseException(RESPONSE_ERROR);
+        } catch (BaseException e) {
+            throw new BaseException(e.getStatus());
         }
     }
 
