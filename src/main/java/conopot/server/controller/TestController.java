@@ -43,6 +43,7 @@ public class TestController{
     @GetMapping("/testFileIO")
     public BaseResponse<String> testFileApi(){
         try{
+            fileService.initData();
             fileService.getAllData();
             return new BaseResponse<String>("PASS");
         } catch(BaseException e){
@@ -116,48 +117,4 @@ public class TestController{
         return new BaseResponse<String>("Docker를 정상적으로 실행했습니다.");
     }
 
-    @GetMapping("/testCF")
-    public BaseResponse<String> testCloudFront(){
-        try{
-            fileRepository.getZipFileFromS3();
-            return new BaseResponse<String>("CloudFront로부터 zip 파일을 다운로드받았습니다.");
-        }
-        catch(BaseException e){
-            return new BaseResponse<>(e.getStatus());
-        }
-    }
-
-    @GetMapping("/testUnZip")
-    public BaseResponse<String> testUnZip(){
-        try{
-            fileRepository.unzipFile(filePath.S3_ZIP_FILE, filePath.ZIP_FILE);
-            return new BaseResponse<String>("zip 파일을 압축 해제하였습니다.");
-        }
-        catch(BaseException e){
-            return new BaseResponse<>(e.getStatus());
-        }
-    }
-
-    @GetMapping("/testInitData")
-    public BaseResponse<String> testInitData(){
-        try{
-            fileRepository.initData();
-            return new BaseResponse<String>("Data를 불러오는데 성공했습니다.");
-        }
-        catch(BaseException e){
-            return new BaseResponse<>(e.getStatus());
-        }
-    }
-
-    @GetMapping("/testStaticFile")
-    public BaseResponse<String> testStaticFile(){
-        try{
-            ArrayList<Music> musicBook = fileRepository.getMusicBook("resources/static/Files/AllTimeLegend.txt");
-            log.info("Music Book size : {}", musicBook.size());
-            return new BaseResponse<String>("내부 파일을 가져오는데 성공했습니다.");
-        }
-        catch(BaseException e){
-            return new BaseResponse<>(e.getStatus());
-        }
-    }
 }

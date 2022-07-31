@@ -38,96 +38,67 @@ public class FileService {
      * @throws BaseException
      */
     public void initData() throws BaseException {
-        fileRepository.initData();
+        try {
+            fileRepository.initData();
+        } catch (BaseException e){
+            throw new BaseException(e.getStatus());
+        }
     }
 
     /**
      * 전체 데이터 받아오기 (test용)
      * @throws BaseException
      */
-    public void getAllData() throws BaseException {
-        try{
-            ArrayList<Music> TJ = fileRepository.getMusicBook(filePath.MUSIC_BOOK_TJ);
-            ArrayList<Music> KY = fileRepository.getMusicBook(filePath.MUSIC_BOOK_KY);
-            ArrayList<Music> Legend = fileRepository.getMusicBook(filePath.ALL_TIME_LEGEND);
-            ArrayList<Highest> highest = fileRepository.getHighest(filePath.MUSIC_HIGHEST_KEY);
-            ArrayList<MatchingMusic> matchingMusics = fileRepository.getMatchingMusics(filePath.MATCHING_MUSICS);
-            Map<String, String> matchingSingers = fileRepository.getMatchingSingers(filePath.MATCHING_SINGERS);
-        } catch (BaseException e) {
-            throw new BaseException(e.getStatus());
-        }
+    public void getAllData() {
+        ArrayList<Music> TJ = fileRepository.getTJ();
+        log.info("TJ size : {}", TJ.size());
+
+        ArrayList<Music> KY = fileRepository.getKY();
+        log.info("KY size : {}", KY.size());
+
+        ArrayList<Music> Legend = fileRepository.getLegend();
+        log.info("Legend size : {}", Legend.size());
+
+        ArrayList<MatchingMusic> matchingMusics = fileRepository.getMatchingMusics();
+        log.info("MatchingMusics size : {}", matchingMusics.size());
+
+        Map<String, String> matchingSingers = fileRepository.getMatchingSingers();
+        log.info("MatchingSingers size : {}", matchingSingers.size());
     }
 
     // TJ 전 곡
     public ArrayList<Music> getMusicBookTJ() throws BaseException{
-        try{
-            return fileRepository.getMusicBook(filePath.MUSIC_BOOK_TJ);
-        } catch (BaseException e) {
-            throw new BaseException(e.getStatus());
-        }
+        return fileRepository.getTJ();
     }
 
     // KY 전 곡
     public ArrayList<Music> getMusicBookKY() throws BaseException{
-        try{
-            return fileRepository.getMusicBook(filePath.MUSIC_BOOK_KY);
-        } catch (BaseException e) {
-            throw new BaseException(e.getStatus());
-        }
+        return fileRepository.getKY();
     }
 
     // TJ 2년치 기준 인기곡 100곡
     public ArrayList<Music> getLegend() throws BaseException {
-        try{
-            return fileRepository.getMusicBook(filePath.ALL_TIME_LEGEND);
-        } catch (BaseException e) {
-            throw new BaseException(e.getStatus());
-        }
-    }
-
-    // 최고음
-    public ArrayList<Highest> getHighest() throws BaseException {
-        try{
-            return fileRepository.getHighest(filePath.MUSIC_HIGHEST_KEY);
-        } catch (BaseException e) {
-            throw new BaseException(e.getStatus());
-        }
+        return fileRepository.getLegend();
     }
 
     // TJ + KY 매칭 완료된 곡들
     public ArrayList<MatchingMusic> getMatchingMusics() throws BaseException {
-        try{
-            return fileRepository.getMatchingMusics(filePath.MATCHING_MUSICS);
-        } catch (BaseException e) {
-            throw new BaseException(e.getStatus());
-        }
+        return fileRepository.getMatchingMusics();
     }
 
     // 가수 변환
     public Map<String, String> getMatchingSingers() throws BaseException {
-        try{
-            return fileRepository.getMatchingSingers(filePath.MATCHING_SINGERS);
-        } catch (BaseException e) {
-            throw new BaseException(e.getStatus());
-        }
+        return fileRepository.getMatchingSingers();
     }
 
     // TJ 매칭 안 된 곡들
     public ArrayList<Music> getNonMatchingTJ() throws BaseException {
-        try{
-            return fileRepository.getMusicBook(filePath.NON_MATCHING_TJ);
-        } catch (BaseException e) {
-            throw new BaseException(e.getStatus());
-        }
+        return fileRepository.getNonMatchingTJ();
     }
 
     // KY 매칭 안 된 곡들
     public ArrayList<Music> getNonMatchingKY() throws BaseException {
-        try{
-            return fileRepository.getMusicBook(filePath.NON_MATCHING_KY);
-        } catch (BaseException e) {
-            throw new BaseException(e.getStatus());
-        }
+        return fileRepository.getNonMatchingKY();
     }
 
     // 텍스트 파일 저장
