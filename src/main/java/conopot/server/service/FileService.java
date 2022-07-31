@@ -132,7 +132,8 @@ public class FileService {
     public void makeZip(String path) throws BaseException{
         try{
             fileRepository.makeZipFiles();
-            if(!checkFileSize()) throw new BaseException(FILE_SIZE_ERROR);
+            if(!checkFileSize(filePath.DOCKER_MUSICS_ZIP_FILE,3L*1024) ||
+                    !checkFileSize(filePath.DOCKER_MATCHINGS_ZIP_FILE, 500L)) throw new BaseException(FILE_SIZE_ERROR);
         } catch (BaseException e) {
             throw new BaseException(e.getStatus());
         }
@@ -143,12 +144,12 @@ public class FileService {
      * @return
      * @throws BaseException
      */
-    public boolean checkFileSize() throws BaseException{
+    public boolean checkFileSize(String fp, long cmp) throws BaseException{
         try{
-            Path path = Paths.get(filePath.S3_ZIP_FILE);
+            Path path = Paths.get(fp);
             long kb = Files.size(path) / 1024;
-            log.info("File Size : {}", kb);
-            return kb > 3*1024 ? true : false;
+            log.info("{} File Size : {}", fp, kb);
+            return kb > cmp ? true : false;
         } catch(Exception e){
             throw new BaseException(FILE_CHECK_SIZE_ERROR);
         }

@@ -2,7 +2,6 @@ package conopot.server.repository;
 
 import conopot.server.config.BaseException;
 import conopot.server.config.FilePath;
-import conopot.server.dto.Highest;
 import conopot.server.dto.MatchingMusic;
 import conopot.server.dto.Music;
 import lombok.Getter;
@@ -11,26 +10,16 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.FileCopyUtils;
-import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import static conopot.server.config.BaseResponseStatus.*;
@@ -245,20 +234,15 @@ public class FileRepository {
         }finally {
             bs.close();
         }
+
+        log.info("Saved Text : {}", path);
     }
 
     // MatchingSingers 맵을 String으로
     public String changeMatchingSingerMap(Map<String, String> m){
         String output = "";
-
-        return output;
-    }
-
-    // MatchingMusic 배열을 String으로
-    public String changeMatchingMusicArr(ArrayList<MatchingMusic> arr){
-        String output = "";
-        for(MatchingMusic m : arr) {
-            output += m.toString() + "\n";
+        for (Map.Entry<String, String> entrySet : m.entrySet()) {
+            output += entrySet.getKey() + "^" + entrySet.getValue() + "^" + "\n";
         }
         return output;
     }
@@ -277,10 +261,17 @@ public class FileRepository {
         try {
             String[] musics = {"musicbook_KY.txt", "musicbook_TJ.txt", "chart_KY.txt", "chart_TJ.txt", "matching_Musics.txt"};
             makeZip("/Musics.zip", musics);
+
+            // Legend 파일과 singers 파일 출력
+            savedText(changeMusicArr(Legend), "/AllTimeLegend.txt");
+            savedText(changeMatchingSingerMap(matchingSingers), "/matchingSingers.txt");
             String[] matchings = {"AllTimeLegend.txt", "matchingSingers.txt", "nonMatchingKY.txt", "nonMatchingTJ.txt"};
             makeZip("/MatchingFiles.zip", matchings);
+
         } catch(BaseException e){
             throw new BaseException(e.getStatus());
+        } catch (IOException e){
+            throw new BaseException(FILE_ZIP_ERROR);
         }
     }
 

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -96,7 +97,7 @@ public class TestController{
     @GetMapping("/testFileSize")
     public BaseResponse<String> testFileSizeApi() throws Exception{
         try{
-            String ret = fileService.checkFileSize() ? "PASS" : "FAIL";
+            String ret = fileService.checkFileSize("/", 3*1024) ? "PASS" : "FAIL";
             return new BaseResponse<String>(ret);
         } catch(BaseException e){
             return new BaseResponse<>(e.getStatus());
@@ -117,5 +118,13 @@ public class TestController{
         if(oldFile.exists()) {
             log.info("해당 경로에 파일이 이미 존재하고 있습니다!");
         }
+
+        FileReader file_reader = new FileReader(oldFile);
+        int cur = 0; String temp = "";
+        while ((cur = file_reader.read()) != -1) {
+            char c = (char) cur;
+            temp += c;
+        }
+        log.info("Temp is : {}", temp);
     }
 }
