@@ -131,7 +131,7 @@ public class FileService {
     // zip 파일 생성
     public void makeZip(String path) throws BaseException{
         try{
-            fileRepository.makeZip(path);
+            fileRepository.makeZipFiles();
             if(!checkFileSize()) throw new BaseException(FILE_SIZE_ERROR);
         } catch (BaseException e) {
             throw new BaseException(e.getStatus());

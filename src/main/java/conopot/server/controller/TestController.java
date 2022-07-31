@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -82,16 +83,6 @@ public class TestController{
         }
     }
 
-    @GetMapping("/testS3")
-    public BaseResponse<String> testS3Api() throws Exception{
-        try{
-            awsS3Service.uploadZipFile();
-            return new BaseResponse<String>("PASS");
-        } catch(BaseException e){
-            return new BaseResponse<>(e.getStatus());
-        }
-    }
-
     @GetMapping("/testMail")
     public BaseResponse<String> testMailApi() throws Exception{
         try{
@@ -117,4 +108,14 @@ public class TestController{
         return new BaseResponse<String>("Docker를 정상적으로 실행했습니다.");
     }
 
+
+    @GetMapping("/rootDir")
+    public void testRootDir() throws BaseException, IOException {
+        fileRepository.savedText("Hello!", "/hello.txt");
+        // 이미 파일이 존재하면 삭제하기
+        File oldFile = new File("/hello.txt");
+        if(oldFile.exists()) {
+            log.info("해당 경로에 파일이 이미 존재하고 있습니다!");
+        }
+    }
 }

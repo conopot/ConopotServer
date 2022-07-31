@@ -245,7 +245,7 @@ public class CrawlingService {
             Collections.sort(musicBookTJ);
 
             // .txt 파일 저장
-            savedTxt(musicBookTJ, filePath.MUSIC_BOOK_TJ);
+            savedTxt(musicBookTJ, "/musicbook_TJ.txt");
 
             // matchingMusics에 신곡들 추가
             addMatchingMusics(latestTJ);
@@ -322,7 +322,7 @@ public class CrawlingService {
             Collections.sort(musicBookKY);
 
             // .txt 파일 저장
-            savedTxt(musicBookKY, filePath.MUSIC_BOOK_KY);
+            savedTxt(musicBookKY, "/musicbook_KY.txt");
 
             return latestKY;
 
@@ -393,7 +393,7 @@ public class CrawlingService {
             throw new BaseException(CRAWL_FAMOUS_TJ_ERROR);
         }
 
-        savedTxt(famousTJ, filePath.CHART_TJ);
+        savedTxt(famousTJ, "/chart_TJ.txt");
     }
 
 
@@ -451,7 +451,7 @@ public class CrawlingService {
             }
         }
 
-        savedTxt(famousKY, filePath.CHART_KY);
+        savedTxt(famousKY, "/chart_KY.txt");
     }
 
     /**

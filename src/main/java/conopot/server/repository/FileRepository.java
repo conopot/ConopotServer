@@ -247,16 +247,53 @@ public class FileRepository {
         }
     }
 
+    // MatchingSingers 맵을 String으로
+    public String changeMatchingSingerMap(Map<String, String> m){
+        String output = "";
+
+        return output;
+    }
+
+    // MatchingMusic 배열을 String으로
+    public String changeMatchingMusicArr(ArrayList<MatchingMusic> arr){
+        String output = "";
+        for(MatchingMusic m : arr) {
+            output += m.toString() + "\n";
+        }
+        return output;
+    }
+
+    // Music 배열을 String으로
+    public String changeMusicArr(ArrayList<Music> arr){
+        String output = "";
+        for(Music m : arr) {
+            output += m.toString() + "\n";
+        }
+        return output;
+    }
+
+    // Musics.zip 파일에 들어가야 되는 파일들 생성
+    public void makeZipFiles() throws BaseException{
+        try {
+            String[] musics = {"musicbook_KY.txt", "musicbook_TJ.txt", "chart_KY.txt", "chart_TJ.txt", "matching_Musics.txt"};
+            makeZip("/Musics.zip", musics);
+            String[] matchings = {"AllTimeLegend.txt", "matchingSingers.txt", "nonMatchingKY.txt", "nonMatchingTJ.txt"};
+            makeZip("/MatchingFiles.zip", matchings);
+        } catch(BaseException e){
+            throw new BaseException(e.getStatus());
+        }
+    }
+
     // zip 파일로 변환
-    public void makeZip(String path) throws BaseException{
+    public void makeZip(String zipFilePath, String[] cmp) throws BaseException{
 
         // 이미 존재한다면, 삭제하기
-        File oldFile = new File(path + "Musics.zip");
+        File oldFile = new File(zipFilePath);
         if(oldFile.exists()) {
             oldFile.delete();
         }
 
-        File file_ = new File(path);
+        File file_ = new File("/");
         File[] listFiles = file_.listFiles();
 
         FileOutputStream fos = null;
@@ -265,10 +302,21 @@ public class FileRepository {
 
         try {
 
-            fos = new FileOutputStream(path + "/Musics.zip");
+            fos = new FileOutputStream(zipFilePath);
             zipOut = new ZipOutputStream(fos);
 
             for(File fileToZip :  listFiles) {
+
+                // 요구한 파일만 zip
+                boolean check = false;
+                for(String str : cmp) {
+                    if(str.equals(fileToZip.getName())) {
+                        check = true;
+                        break;
+                    }
+                }
+
+                if(!check) continue;
 
                 fis = new FileInputStream(fileToZip);
                 ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
@@ -358,7 +406,7 @@ public class FileRepository {
         }
     }
 
-    // cloudfront에서 MatchingFile.zip file 다운로드 후 init
+    // cloudfront에서 MatchingFiles.zip file 다운로드 후 init
     public void getMatchingZipFileFromS3() throws BaseException{
         try{
             String fileName = "MatchingFiles.zip";
