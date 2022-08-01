@@ -45,9 +45,9 @@ public class MatchingService {
             matchingAlgorithm(nonMatchingTJ, nonMatchingKY, matchingSingers, matchingMusics);
 
             // 파일들 내보내기
-            fileService.savedText(fileService.changeMatchingMusicArr(matchingMusics), filePath.MATCHING_MUSICS);
-            fileService.savedText(fileService.changeMusicArr(nonMatchingTJ), filePath.NON_MATCHING_TJ);
-            fileService.savedText(fileService.changeMusicArr(nonMatchingKY), filePath.NON_MATCHING_KY);
+            fileService.savedText(fileService.changeMatchingMusicArr(matchingMusics), "/matching_Musics.txt");
+            fileService.savedText(fileService.changeMusicArr(nonMatchingTJ), "/nonMatchingTJ.txt");
+            fileService.savedText(fileService.changeMusicArr(nonMatchingKY), "/nonMatchingKY.txt");
 
         } catch(BaseException e){
             throw new BaseException(e.getStatus());

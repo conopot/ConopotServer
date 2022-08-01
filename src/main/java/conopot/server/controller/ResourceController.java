@@ -3,11 +3,8 @@ package conopot.server.controller;
 import conopot.server.config.BaseException;
 import conopot.server.config.BaseResponse;
 import conopot.server.config.FilePath;
-import conopot.server.service.AwsS3Service;
-import conopot.server.service.CrawlingService;
-import conopot.server.service.FileService;
-import conopot.server.service.MailService;
 import lombok.extern.java.Log;
+import conopot.server.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,16 +21,18 @@ public class ResourceController {
     private final FileService fileService;
     private final AwsS3Service awsS3Service;
     private final MailService mailService;
+    private final VersionService versionService;
     private FilePath filePath;
 
-    @Autowired
-    public ResourceController(CrawlingService crawlingService, FileService fileService, AwsS3Service awsS3Service, MailService mailService) {
+    public ResourceController(CrawlingService crawlingService, FileService fileService, AwsS3Service awsS3Service, MailService mailService, VersionService versionService) {
         this.crawlingService = crawlingService;
         this.fileService = fileService;
         this.awsS3Service = awsS3Service;
         this.mailService = mailService;
+        this.versionService = versionService;
         this.filePath = new FilePath();
     }
+
 
     @GetMapping("/music/update")
     public BaseResponse<String> updateMusic() throws Exception {
@@ -42,9 +41,13 @@ public class ResourceController {
             crawlingService.crawlingLatest();
             crawlingService.crawlingFamous();
             fileService.makeZip(filePath.ZIP_FILE);
-            awsS3Service.uploadZipFile();
+            awsS3Service.uploadZipFile("public/Musics.zip", filePath.DOCKER_MUSICS_ZIP_FILE);
+            awsS3Service.uploadZipFile("public/MatchingFiles.zip", filePath.DOCKER_MATCHINGS_ZIP_FILE);
+            versionService.savedVersion("SUCCESS");
+            mailService.successMailSend();
         } catch(BaseException e){
-            mailService.mailSend();
+            versionService.savedVersion("FAIL");
+            mailService.failMailSend();
             return new BaseResponse<>(e.getStatus());
         }
         return new BaseResponse<>(SUCCESS);

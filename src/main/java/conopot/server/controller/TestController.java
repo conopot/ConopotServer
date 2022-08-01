@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -26,16 +28,17 @@ public class TestController{
     private final AwsS3Service awsS3Service;
     private final MailService mailService;
     private final FileRepository fileRepository;
+    private final VersionService versionService;
     private FilePath filePath;
 
-    @Autowired
-    public TestController(FileService fileService, CrawlingService crawlingService, MatchingService matchingService, AwsS3Service awsS3Service, MailService mailService, FileRepository fileRepository) {
+    public TestController(FileService fileService, CrawlingService crawlingService, MatchingService matchingService, AwsS3Service awsS3Service, MailService mailService, FileRepository fileRepository, VersionService versionService) {
         this.fileService = fileService;
         this.crawlingService = crawlingService;
         this.matchingService = matchingService;
         this.awsS3Service = awsS3Service;
         this.mailService = mailService;
         this.fileRepository = fileRepository;
+        this.versionService = versionService;
         filePath = new FilePath();
     }
 
@@ -43,6 +46,7 @@ public class TestController{
     @GetMapping("/testFileIO")
     public BaseResponse<String> testFileApi(){
         try{
+            fileService.initData();
             fileService.getAllData();
             return new BaseResponse<String>("PASS");
         } catch(BaseException e){
@@ -81,20 +85,10 @@ public class TestController{
         }
     }
 
-    @GetMapping("/testS3")
-    public BaseResponse<String> testS3Api() throws Exception{
-        try{
-            awsS3Service.uploadZipFile();
-            return new BaseResponse<String>("PASS");
-        } catch(BaseException e){
-            return new BaseResponse<>(e.getStatus());
-        }
-    }
-
     @GetMapping("/testMail")
     public BaseResponse<String> testMailApi() throws Exception{
         try{
-            mailService.mailSend();
+            mailService.failMailSend();
             return new BaseResponse<String>("PASS");
         } catch(BaseException e){
             return new BaseResponse<>(e.getStatus());
@@ -104,7 +98,7 @@ public class TestController{
     @GetMapping("/testFileSize")
     public BaseResponse<String> testFileSizeApi() throws Exception{
         try{
-            String ret = fileService.checkFileSize() ? "PASS" : "FAIL";
+            String ret = fileService.checkFileSize("/", 3*1024) ? "PASS" : "FAIL";
             return new BaseResponse<String>(ret);
         } catch(BaseException e){
             return new BaseResponse<>(e.getStatus());
@@ -116,47 +110,41 @@ public class TestController{
         return new BaseResponse<String>("Docker를 정상적으로 실행했습니다.");
     }
 
-    @GetMapping("/testCF")
-    public BaseResponse<String> testCloudFront(){
-        try{
-            fileRepository.getZipFileFromS3();
-            return new BaseResponse<String>("CloudFront로부터 zip 파일을 다운로드받았습니다.");
+
+    @GetMapping("/rootDir")
+    public void testRootDir() throws BaseException, IOException {
+        fileRepository.savedText("Hello!", "/hello.txt");
+        // 이미 파일이 존재하면 삭제하기
+        File oldFile = new File("/hello.txt");
+        if(oldFile.exists()) {
+            log.info("해당 경로에 파일이 이미 존재하고 있습니다!");
         }
-        catch(BaseException e){
+
+        FileReader file_reader = new FileReader(oldFile);
+        int cur = 0; String temp = "";
+        while ((cur = file_reader.read()) != -1) {
+            char c = (char) cur;
+            temp += c;
+        }
+        log.info("Temp is : {}", temp);
+    }
+
+    @GetMapping("/testSuccessMail")
+    public BaseResponse<String> testSuccessMail() {
+        try{
+            mailService.successMailSend();
+            return new BaseResponse<String>("SUCCESS");
+        } catch(BaseException e){
             return new BaseResponse<>(e.getStatus());
         }
     }
 
-    @GetMapping("/testUnZip")
-    public BaseResponse<String> testUnZip(){
+    @GetMapping("/testSavedVersion")
+    public BaseResponse<String> testSavedVersion() {
         try{
-            fileRepository.unzipFile(filePath.S3_ZIP_FILE, filePath.ZIP_FILE);
-            return new BaseResponse<String>("zip 파일을 압축 해제하였습니다.");
-        }
-        catch(BaseException e){
-            return new BaseResponse<>(e.getStatus());
-        }
-    }
-
-    @GetMapping("/testInitData")
-    public BaseResponse<String> testInitData(){
-        try{
-            fileRepository.initData();
-            return new BaseResponse<String>("Data를 불러오는데 성공했습니다.");
-        }
-        catch(BaseException e){
-            return new BaseResponse<>(e.getStatus());
-        }
-    }
-
-    @GetMapping("/testStaticFile")
-    public BaseResponse<String> testStaticFile(){
-        try{
-            ArrayList<Music> musicBook = fileRepository.getMusicBook("resources/static/Files/AllTimeLegend.txt");
-            log.info("Music Book size : {}", musicBook.size());
-            return new BaseResponse<String>("내부 파일을 가져오는데 성공했습니다.");
-        }
-        catch(BaseException e){
+            versionService.savedVersion("SUCCESS");
+            return new BaseResponse<String>("SUCCESS");
+        } catch(BaseException e){
             return new BaseResponse<>(e.getStatus());
         }
     }

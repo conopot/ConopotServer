@@ -37,9 +37,7 @@ public class AwsS3Service {
      * AWS 공식 문서 S3 업로드 코드
      * @throws Exception
      */
-    public void uploadZipFile() throws Exception {
-
-        String keyName = "public/Musics.zip";
+    public void uploadZipFile(String keyName, String path) throws Exception {
 
         try {
             TransferManager tm = TransferManagerBuilder.standard()
@@ -48,7 +46,7 @@ public class AwsS3Service {
 
             // TransferManager processes all transfers asynchronously,
             // so this call returns immediately.
-            Upload upload = tm.upload(bucket, keyName, new File(filePath.S3_ZIP_FILE));
+            Upload upload = tm.upload(bucket, keyName, new File(path));
             log.info("Object upload started");
 
             // Optionally, wait for the upload to finish before continuing.

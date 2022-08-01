@@ -29,7 +29,7 @@ public class LyricsRepository {
     }
     public void saveLyricsTJ(String number, String lyrics) throws BaseException {
         try{
-            String query = "insert TJLYRICS VALUES (?, ?)";
+            String query = "INSERT TJLYRICS VALUES (?, ?)";
             Object[] param = new Object[]{number, lyrics};
             this.jdbcTemplate.update(query, param);
         } catch(Exception e){
