@@ -7,11 +7,13 @@ import conopot.server.service.AwsS3Service;
 import conopot.server.service.CrawlingService;
 import conopot.server.service.FileService;
 import conopot.server.service.MailService;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import static conopot.server.config.BaseResponseStatus.SUCCESS;
 
@@ -43,6 +45,16 @@ public class ResourceController {
             awsS3Service.uploadZipFile();
         } catch(BaseException e){
             mailService.mailSend();
+            return new BaseResponse<>(e.getStatus());
+        }
+        return new BaseResponse<>(SUCCESS);
+    }
+
+    @GetMapping("/music/crawling")
+    public BaseResponse<String> crawlingMusics() throws Exception {
+        try {
+            crawlingService.crawlingLyricByNumberTJ("4");
+        } catch(BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
         return new BaseResponse<>(SUCCESS);
