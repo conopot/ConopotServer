@@ -261,7 +261,7 @@ public class CrawlingService {
         // matchingMusics에 신곡 추가
         ArrayList<MatchingMusic> matchingMusics = fileService.getMatchingMusics();
         for(Music m : latestTJ) {
-            matchingMusics.add(new MatchingMusic(m, new Music("", "", "")));
+            matchingMusics.add(new MatchingMusic(m, new Music("?", "?", "?")));
         }
 
         // matchingMusics 번호 순 정렬
