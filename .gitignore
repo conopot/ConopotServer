@@ -39,3 +39,4 @@ out/
 ### USER ###
 application.properties
 .DS_Store
+docker/server-0.0.1-SNAPSHOT.jar
