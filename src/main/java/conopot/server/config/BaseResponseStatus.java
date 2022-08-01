@@ -29,7 +29,9 @@ public enum BaseResponseStatus {
     SERVER_ERROR(false, 4001, "서버와의 연결에 실패하였습니다."),
     DATABASE_CHECK_ALREADY_ERROR(false, 4002, "이미 있는 데이터인지 확인하는데 실패하였습니다."),
     DATABASE_LYRICS_SAVED_ERROR(false, 4003, "가사를 저장하는데 실패하였습니다."),
-    MAIL_SEND_ERROR(false, 4004, "메일을 전송하는데 실패하였습니다."),
+    FAIL_MAIL_SEND_ERROR(false, 4004, "API 실패 메일을 전송하는데 실패하였습니다."),
+    SUCCESS_MAIL_SEND_ERROR(false, 4005, "API 성공 전송하는데 실패하였습니다."),
+    DATABASE_VERSION_SAVED_ERROR(false, 4006, "API 호출 결과를 저장하는데 실패하였습니다."),
 
     /**
      * 5000 : File I/O 오류

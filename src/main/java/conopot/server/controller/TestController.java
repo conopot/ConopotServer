@@ -28,16 +28,17 @@ public class TestController{
     private final AwsS3Service awsS3Service;
     private final MailService mailService;
     private final FileRepository fileRepository;
+    private final VersionService versionService;
     private FilePath filePath;
 
-    @Autowired
-    public TestController(FileService fileService, CrawlingService crawlingService, MatchingService matchingService, AwsS3Service awsS3Service, MailService mailService, FileRepository fileRepository) {
+    public TestController(FileService fileService, CrawlingService crawlingService, MatchingService matchingService, AwsS3Service awsS3Service, MailService mailService, FileRepository fileRepository, VersionService versionService) {
         this.fileService = fileService;
         this.crawlingService = crawlingService;
         this.matchingService = matchingService;
         this.awsS3Service = awsS3Service;
         this.mailService = mailService;
         this.fileRepository = fileRepository;
+        this.versionService = versionService;
         filePath = new FilePath();
     }
 
@@ -87,7 +88,7 @@ public class TestController{
     @GetMapping("/testMail")
     public BaseResponse<String> testMailApi() throws Exception{
         try{
-            mailService.mailSend();
+            mailService.failMailSend();
             return new BaseResponse<String>("PASS");
         } catch(BaseException e){
             return new BaseResponse<>(e.getStatus());
@@ -126,5 +127,25 @@ public class TestController{
             temp += c;
         }
         log.info("Temp is : {}", temp);
+    }
+
+    @GetMapping("/testSuccessMail")
+    public BaseResponse<String> testSuccessMail() {
+        try{
+            mailService.successMailSend();
+            return new BaseResponse<String>("SUCCESS");
+        } catch(BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    @GetMapping("/testSavedVersion")
+    public BaseResponse<String> testSavedVersion() {
+        try{
+            versionService.savedVersion("SUCCESS");
+            return new BaseResponse<String>("SUCCESS");
+        } catch(BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
     }
 }
