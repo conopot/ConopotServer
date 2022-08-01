@@ -3,12 +3,14 @@ package conopot.server.controller;
 import conopot.server.config.BaseException;
 import conopot.server.config.BaseResponse;
 import conopot.server.config.FilePath;
+import lombok.extern.java.Log;
 import conopot.server.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import static conopot.server.config.BaseResponseStatus.SUCCESS;
 
@@ -46,6 +48,16 @@ public class ResourceController {
         } catch(BaseException e){
             versionService.savedVersion("FAIL");
             mailService.failMailSend();
+            return new BaseResponse<>(e.getStatus());
+        }
+        return new BaseResponse<>(SUCCESS);
+    }
+
+    @GetMapping("/music/crawling")
+    public BaseResponse<String> crawlingMusics() throws Exception {
+        try {
+            crawlingService.crawlingLyricByNumberTJ("4");
+        } catch(BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
         return new BaseResponse<>(SUCCESS);

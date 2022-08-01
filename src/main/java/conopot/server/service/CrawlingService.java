@@ -92,7 +92,11 @@ public class CrawlingService {
 
             Element element = document.select("pre").get(3);
 
-            lyrics = element.text();
+            lyrics = element.toString();
+
+            // replace newline characters
+            lyrics = lyrics.replaceAll("<br>", "\n");
+            lyrics = lyrics.replaceAll("(<pre>|</pre>)", "");
 
         } catch (Exception e) {
             return false; // TJ는 가사가 없는 것들도 있기 때문에 continue 해주어야 한다.
