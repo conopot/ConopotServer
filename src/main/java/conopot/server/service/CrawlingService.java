@@ -170,6 +170,9 @@ public class CrawlingService {
 
         for(int i=1; i<=30; i++){
             String url = "https://kysing.kr/latest/?s_page=" + i;
+            if(i % 10 == 0) {
+                log.info("KY Latest Crawling {}%", 33*(i/10));
+            }
 
             Connection conn = Jsoup.connect(url);
 
