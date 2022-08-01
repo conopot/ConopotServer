@@ -458,11 +458,6 @@ public class FileRepository {
             File file = new File(fileName);
             FileUtils.copyURLToFile(new URL(url), file);
 
-            String OUTPUT_FILE_PATH = "/" + fileName;
-            try(InputStream in = new URL(url).openStream()){
-                Path imagePath = Paths.get(OUTPUT_FILE_PATH);
-                Files.copy(in, imagePath);
-            }
         } catch (MalformedURLException me){
             me.printStackTrace();
             throw new BaseException(FILE_CLOUDFRONT_DOWNLOAD_ERROR);
