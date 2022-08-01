@@ -21,6 +21,7 @@ public class MatchingMusic implements Comparable<MatchingMusic> {
 
     @Override
     public int compareTo(MatchingMusic o) {
-        return this.TJ.getNumber().compareTo(o.getTJ().getNumber());
+        if(Integer.valueOf(this.TJ.getNumber()) > Integer.valueOf(o.TJ.getNumber())) return 1;
+        else return -1;
     }
 }

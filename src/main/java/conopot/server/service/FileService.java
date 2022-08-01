@@ -101,6 +101,11 @@ public class FileService {
         return fileRepository.getNonMatchingKY();
     }
 
+    // Set MatchingMusics
+    public void setMatchingMusics(ArrayList<MatchingMusic> arr) {
+        fileRepository.setMatchingMusics(arr);
+    }
+
     // 텍스트 파일 저장
     public void savedText(String output, String path) throws BaseException, IOException {
         try{
