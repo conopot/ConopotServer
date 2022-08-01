@@ -38,6 +38,10 @@ public class MatchingService {
             nonMatchingTJ.addAll(latestTJ);
             nonMatchingKY.addAll(latestKY);
 
+            // 정렬 (이분탐색용)
+            Collections.sort(nonMatchingTJ);
+            Collections.sort(nonMatchingKY);
+
             // 매칭 시키기
             Map<String, String> matchingSingers = fileService.getMatchingSingers();
             ArrayList<MatchingMusic> matchingMusics = fileService.getMatchingMusics();
@@ -67,7 +71,10 @@ public class MatchingService {
                 String lNum = lm.getNumber();
                 for(MatchingMusic m : matchingMusics) {
                     if(m.getTJ().getNumber().equals(lNum)) {
-                        temp.add(m);
+                        Music tj = m.getTJ();
+                        Music ky = m.getKY();
+                        temp.add(new MatchingMusic(new Music(tj.getName(), tj.getSinger(), tj.getNumber()),
+                                new Music(ky.getName(), ky.getSinger(), ky.getNumber())));
                         matchingMusics.remove(m);
                         break;
                     }
