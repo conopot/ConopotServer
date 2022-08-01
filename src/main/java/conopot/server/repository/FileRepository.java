@@ -15,6 +15,9 @@ import org.springframework.stereotype.Repository;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -259,7 +262,10 @@ public class FileRepository {
     // Musics.zip 파일에 들어가야 되는 파일들 생성
     public void makeZipFiles() throws BaseException{
         try {
-            String[] musics = {"musicbook_KY.txt", "musicbook_TJ.txt", "chart_KY.txt", "chart_TJ.txt", "matching_Musics.txt"};
+            // highest_Pitch.txt 파일을 받아온다
+            getHighestFileFromS3();
+
+            String[] musics = {"musicbook_KY.txt", "musicbook_TJ.txt", "chart_KY.txt", "chart_TJ.txt", "matching_Musics.txt", "highest_Pitch.txt"};
             makeZip("/Musics.zip", musics);
 
             // Legend 파일과 singers 파일 출력
@@ -434,6 +440,29 @@ public class FileRepository {
 
         } catch(BaseException e){
             throw new BaseException(e.getStatus());
+        } catch (MalformedURLException me){
+            me.printStackTrace();
+            throw new BaseException(FILE_CLOUDFRONT_DOWNLOAD_ERROR);
+        } catch (IOException e){
+            e.printStackTrace();
+            throw new BaseException(FILE_UNZIP_ERROR);
+        }
+    }
+
+    // cloudfront에서 highest_Pitch file 다운로드 후 init
+    public void getHighestFileFromS3() throws BaseException{
+        try{
+            String fileName = "highest_Pitch.txt";
+            String url = cloudFrontUrl + fileName;
+
+            File file = new File(fileName);
+            FileUtils.copyURLToFile(new URL(url), file);
+
+            String OUTPUT_FILE_PATH = "/" + fileName;
+            try(InputStream in = new URL(url).openStream()){
+                Path imagePath = Paths.get(OUTPUT_FILE_PATH);
+                Files.copy(in, imagePath);
+            }
         } catch (MalformedURLException me){
             me.printStackTrace();
             throw new BaseException(FILE_CLOUDFRONT_DOWNLOAD_ERROR);
