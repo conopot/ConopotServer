@@ -44,12 +44,43 @@ public class MatchingService {
 
             matchingAlgorithm(nonMatchingTJ, nonMatchingKY, matchingSingers, matchingMusics);
 
+            // Legend 곡 들 앞으로 빼주기
+            legendToFront();
+
             // 파일들 내보내기
             fileService.savedText(fileService.changeMatchingMusicArr(matchingMusics), "/matching_Musics.txt");
             fileService.savedText(fileService.changeMusicArr(nonMatchingTJ), "/nonMatchingTJ.txt");
             fileService.savedText(fileService.changeMusicArr(nonMatchingKY), "/nonMatchingKY.txt");
 
         } catch(BaseException e){
+            throw new BaseException(e.getStatus());
+        }
+    }
+
+    public void legendToFront() throws BaseException{
+        try{
+            // 인기곡 100곡 앞으로 정렬
+            ArrayList<MatchingMusic> matchingMusics = fileService.getMatchingMusics();
+            ArrayList<Music> legend = fileService.getLegend();
+            ArrayList<MatchingMusic> temp = new ArrayList<>();
+
+            for(Music lm : legend) {
+                String lNum = lm.getNumber();
+                for(MatchingMusic m : matchingMusics) {
+                    if(m.getTJ().getNumber().equals(lNum)) {
+                        temp.add(m);
+                        matchingMusics.remove(m);
+                        break;
+                    }
+                }
+            }
+
+            for(MatchingMusic m : matchingMusics) {
+                temp.add(m);
+            }
+
+            matchingMusics = temp;
+        } catch (BaseException e){
             throw new BaseException(e.getStatus());
         }
     }

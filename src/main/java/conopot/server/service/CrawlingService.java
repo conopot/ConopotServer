@@ -256,38 +256,16 @@ public class CrawlingService {
         }
     }
 
-    public void addMatchingMusics(ArrayList<Music> latestTJ) throws BaseException, IOException{
+    public void addMatchingMusics(ArrayList<Music> latestTJ) throws BaseException, IOException {
 
         // matchingMusics에 신곡 추가
         ArrayList<MatchingMusic> matchingMusics = fileService.getMatchingMusics();
-        for(Music m : latestTJ) {
+        for (Music m : latestTJ) {
             matchingMusics.add(new MatchingMusic(m, new Music("?", "?", "?")));
         }
 
         // matchingMusics 번호 순 정렬
         Collections.sort(matchingMusics);
-
-        // Legend 곡 들 앞으로 빼주기
-        // 인기곡 100곡 앞으로 정렬
-        ArrayList<Music> legend = fileService.getLegend();
-        ArrayList<MatchingMusic> temp = new ArrayList<>();
-
-        for(Music lm : legend) {
-            String lNum = lm.getNumber();
-            for(MatchingMusic m : matchingMusics) {
-                if(m.getTJ().getNumber().equals(lNum)) {
-                    temp.add(m);
-                    matchingMusics.remove(m);
-                    break;
-                }
-            }
-        }
-
-        for(MatchingMusic m : matchingMusics) {
-            temp.add(m);
-        }
-
-        matchingMusics = temp;
     }
 
     /**
