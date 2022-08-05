@@ -303,7 +303,7 @@ public class FileRepository {
             fos = new FileOutputStream(zipFilePath);
             zipOut = new ZipOutputStream(fos);
 
-            for(File fileToZip :  listFiles) {
+            for(File fileToZip : listFiles) {
 
                 // 요구한 파일만 zip
                 boolean check = false;
@@ -315,6 +315,12 @@ public class FileRepository {
                 }
 
                 if(!check) continue;
+
+                // File Size가 0byte 일 시 에러 처리 (
+                if(fileToZip.length() == 0L) {
+                    log.info("{} size = 0byte Error", fileToZip.getName());
+                    throw new BaseException(FILE_SIZE_ERROR);
+                }
 
                 fis = new FileInputStream(fileToZip);
                 ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
