@@ -331,9 +331,13 @@ public class CrawlingService {
 
         cal.add(Calendar.DAY_OF_MONTH, -1); // 1일 빼기
 
-        int year = cal.get(Calendar.YEAR);
-        int month = cal.get(Calendar.MONTH ) + 1;
-        int day = cal.get(Calendar.DAY_OF_MONTH);
+        String year = Integer.toString(cal.get(Calendar.YEAR));
+        String month = Integer.toString(cal.get(Calendar.MONTH ) + 1);
+        String day = Integer.toString(cal.get(Calendar.DAY_OF_MONTH));
+
+        // URL 생성 시 0 붙여줘야됨 ex) 8 => 08
+        month = changeForUrl(month);
+        day = changeForUrl(day);
 
         log.info("TJ Famous Date : {}/{}/{}", year, month, day);
 
@@ -378,6 +382,10 @@ public class CrawlingService {
         savedTxt(famousTJ, "/chart_TJ.txt");
     }
 
+    public String changeForUrl(String str){
+        if(str.length() < 2) str = "0" + str;
+        return str;
+    }
 
     /**
      * KY 인기차트 크롤링 및 저장
