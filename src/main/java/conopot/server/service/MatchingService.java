@@ -85,7 +85,9 @@ public class MatchingService {
                 temp.add(m);
             }
 
-            fileService.setMatchingMusics(temp);
+            matchingMusics.clear();
+            matchingMusics.addAll(temp);
+
         } catch (BaseException e){
             throw new BaseException(e.getStatus());
         }
