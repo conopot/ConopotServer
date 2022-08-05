@@ -148,4 +148,13 @@ public class TestController{
             return new BaseResponse<>(e.getStatus());
         }
     }
+
+    @GetMapping("/testKY")
+    public void testKYCrawling(){
+        try {
+            crawlingService.savedFamousKY();
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 }
