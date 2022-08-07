@@ -157,4 +157,14 @@ public class TestController{
             e.printStackTrace();
         }
     }
+
+    @GetMapping("/testSel")
+    public void testSelenium(){
+        try{
+            crawlingService.crawlFamousKYBySelenium();
+            crawlingService.crawlLatestKYBySelenium();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }
