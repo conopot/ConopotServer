@@ -5,6 +5,7 @@ import conopot.server.config.FilePath;
 import conopot.server.dto.MatchingMusic;
 import conopot.server.dto.Music;
 import conopot.server.repository.LyricsRepository;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -14,10 +15,7 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
+import java.util.*;
 
 import static conopot.server.config.BaseResponseStatus.*;
 
@@ -31,11 +29,13 @@ public class CrawlingService {
     boolean checkTJ[] = new boolean[100001];
     boolean checkKY[] = new boolean[100001];
 
+
     public CrawlingService(FileService fileService, LyricsRepository lyricsRepository, MatchingService matchingService) {
         this.fileService = fileService;
         this.lyricsRepository = lyricsRepository;
         this.matchingService = matchingService;
         this.filePath = new FilePath();
+        WebDriverManager.chromedriver().setup(); // chrome driver download
     }
 
     /**
