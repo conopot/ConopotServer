@@ -12,6 +12,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -25,11 +31,12 @@ public class CrawlingService {
     private final FileService fileService;
     private final LyricsRepository lyricsRepository;
     private final MatchingService matchingService;
+    private WebDriverManager wm;
     private FilePath filePath;
     boolean checkTJ[] = new boolean[100001];
     boolean checkKY[] = new boolean[100001];
 
-
+    @Autowired
     public CrawlingService(FileService fileService, LyricsRepository lyricsRepository, MatchingService matchingService) {
         this.fileService = fileService;
         this.lyricsRepository = lyricsRepository;
@@ -58,7 +65,7 @@ public class CrawlingService {
      */
     public void crawlingFamous() throws BaseException, IOException{
         savedFamousTJ();
-        savedFamousKY();
+        crawlFamousKYBySelenium();
     }
 
     /**
@@ -461,5 +468,125 @@ public class CrawlingService {
         } catch (BaseException e) {
             throw new BaseException(e.getStatus());
         }
+    }
+
+    public void crawlFamousKYBySelenium() throws BaseException, IOException{
+
+        ArrayList<Music> musicBookKY = fileService.getMusicBookKY();
+        ArrayList<Music> famousKY = new ArrayList<>();
+
+        try{
+            // config
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("--headless");
+            options.addArguments("--no-sandbox");
+
+            WebDriver driver = new ChromeDriver(options);
+
+            for(int i=1; i<=2; i++){
+
+                String url = "https://kysing.kr/popular/?period=&range=" + i;
+
+                //WebDriver을 해당 url로 이동한다.
+                driver.get(url);
+
+                //1초 대기
+                try {Thread.sleep(2000);} catch (InterruptedException e) {}
+
+                List<WebElement> elements = driver.findElements(By.className("popular_chart_num"));
+                for(WebElement el : elements){
+                    String text = el.getText();
+                    if(text.equals("곡번호")) continue;
+                    for(Music music : musicBookKY) {
+                        if(music.getNumber().equals(text)){
+                            famousKY.add(music);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            try {
+                //드라이버가 null이 아니라면
+                if(driver != null) {
+                    //드라이버 연결 종료
+                    driver.close(); //드라이버 연결 해제
+
+                    //프로세스 종료
+                    driver.quit();
+                }
+            } catch (Exception e) {
+                throw new BaseException(CRAWL_FAMOUS_KY_ERROR);
+            }
+
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new BaseException(CRAWL_FAMOUS_KY_ERROR);
+        }
+
+        savedTxt(famousKY, "/chart_KY.txt");
+    }
+
+    public ArrayList<Music> crawlLatestKYBySelenium() throws BaseException, IOException{
+
+        ArrayList<Music> ret = new ArrayList<>();
+
+        try {
+            // config
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("--headless");
+            options.addArguments("--no-sandbox");
+
+            WebDriver driver = new ChromeDriver(options);
+
+            for (int i = 1; i <= 30; i++) {
+                String url = "https://kysing.kr/latest/?s_page=" + i;
+                if (i % 10 == 0) {
+                    log.info("KY Latest Crawling {}%", 33 * (i / 10));
+                }
+
+                //WebDriver을 해당 url로 이동한다.
+                driver.get(url);
+
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                }
+
+                List<WebElement> names = driver.findElements(By.className("search_chart_tit"));
+                List<WebElement> singers = driver.findElements(By.className("search_chart_sng"));
+                List<WebElement> numbers = driver.findElements(By.className("search_chart_num"));
+
+                String name = "", singer = "", number = "";
+                for (int k = 1; k < numbers.size(); k++) {
+                    name = names.get(k).getText();
+                    singer = singers.get(k).getText();
+                    number = numbers.get(k).getText();
+                    if(name.equals("곡명") || singer.equals("아티스트") || number.equals("곡번호")) continue;
+                    ret.add(new Music(name, singer, number));
+                }
+            }
+
+            try {
+                //드라이버가 null이 아니라면
+                if (driver != null) {
+                    //드라이버 연결 종료
+                    driver.close(); //드라이버 연결 해제
+
+                    //프로세스 종료
+                    driver.quit();
+                }
+            } catch (Exception e) {
+                throw new BaseException(CRAWL_LATEST_KY_ERROR);
+            }
+
+        } catch (Exception e){
+            e.printStackTrace();
+            throw new BaseException(CRAWL_LATEST_KY_ERROR);
+        }
+
+        log.info("KY Latest Before Size : {}", ret.size());
+
+        return ret;
     }
 }
