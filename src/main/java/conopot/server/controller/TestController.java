@@ -162,7 +162,7 @@ public class TestController{
     public void testSelenium(){
         try{
             crawlingService.crawlFamousKYBySelenium();
-            crawlingService.crawlLatestKYBySelenium();
+            // crawlingService.crawlLatestKYBySelenium();
         } catch (Exception e){
             e.printStackTrace();
         }
