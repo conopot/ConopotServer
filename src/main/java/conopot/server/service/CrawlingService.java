@@ -480,7 +480,7 @@ public class CrawlingService {
             System.setProperty("webdriver.chrome.whitelistedIps", "");
 
             ChromeOptions options = new ChromeOptions();
-            options.setBinary("/usr/bin/chromium-browser");
+            // options.setBinary("/usr/bin/chrome");
             options.addArguments("--no-sandbox");
             options.addArguments("--headless");
             options.addArguments("--disable-setuid-sandbox");
