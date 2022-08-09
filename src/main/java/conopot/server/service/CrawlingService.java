@@ -5,7 +5,6 @@ import conopot.server.config.FilePath;
 import conopot.server.dto.MatchingMusic;
 import conopot.server.dto.Music;
 import conopot.server.repository.LyricsRepository;
-import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -17,9 +16,10 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.chromium.ChromiumDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -31,7 +31,6 @@ public class CrawlingService {
     private final FileService fileService;
     private final LyricsRepository lyricsRepository;
     private final MatchingService matchingService;
-    private WebDriverManager wm;
     private FilePath filePath;
     boolean checkTJ[] = new boolean[100001];
     boolean checkKY[] = new boolean[100001];
@@ -42,7 +41,7 @@ public class CrawlingService {
         this.lyricsRepository = lyricsRepository;
         this.matchingService = matchingService;
         this.filePath = new FilePath();
-        WebDriverManager.chromedriver().setup(); // chrome driver download
+        // WebDriverManager.chromedriver().setup(); // chrome driver download
     }
 
     /**
@@ -477,19 +476,29 @@ public class CrawlingService {
 
         try{
             // config
-            ChromeOptions options = new ChromeOptions();
-            options.addArguments("--headless");
-            options.addArguments("--no-sandbox");
+            System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
+            System.setProperty("webdriver.chrome.whitelistedIps", "");
 
+            ChromeOptions options = new ChromeOptions();
+            options.setBinary("/usr/bin/chromium-browser");
+            options.addArguments("--no-sandbox");
+            options.addArguments("--headless");
+            options.addArguments("--disable-setuid-sandbox");
+            options.addArguments("--disable-dev-shm-usage");
+
+            log.info("Before Driver");
             WebDriver driver = new ChromeDriver(options);
+            log.info("AfterDriver");
+
 
             for(int i=1; i<=2; i++){
 
                 String url = "https://kysing.kr/popular/?period=&range=" + i;
 
                 //WebDriver을 해당 url로 이동한다.
+                log.info("Before Move to Crawling url");
                 driver.get(url);
-
+                log.info("After Move to Crawling url");
                 //1초 대기
                 try {Thread.sleep(2000);} catch (InterruptedException e) {}
 
@@ -524,6 +533,8 @@ public class CrawlingService {
             throw new BaseException(CRAWL_FAMOUS_KY_ERROR);
         }
 
+        log.info("Famous KY Size : {}", famousKY.size());
+
         savedTxt(famousKY, "/chart_KY.txt");
     }
 
@@ -533,11 +544,16 @@ public class CrawlingService {
 
         try {
             // config
+            System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
+
             ChromeOptions options = new ChromeOptions();
+            options.setBinary(new File("/usr/lib/chromium/chrome"));
             options.addArguments("--headless");
             options.addArguments("--no-sandbox");
 
+            log.info("Before Driver");
             WebDriver driver = new ChromeDriver(options);
+            log.info("AfterDriver");
 
             for (int i = 1; i <= 30; i++) {
                 String url = "https://kysing.kr/latest/?s_page=" + i;
