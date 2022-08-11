@@ -28,15 +28,11 @@ public class MatchingService {
         filePath = new FilePath();
     }
 
-    public void matchingMusicByAlgorithm(ArrayList<Music> latestTJ, ArrayList<Music> latestKY) throws BaseException, IOException {
+    public void matchingMusicByAlgorithm(ArrayList<Music> latestTJ) throws BaseException, IOException {
         try{
             // nonMatching 파일 받아오기
             ArrayList<Music> nonMatchingTJ = fileService.getNonMatchingTJ();
             ArrayList<Music> nonMatchingKY = fileService.getNonMatchingKY();
-
-            // 신곡들을 nonMatching에 추가
-            nonMatchingTJ.addAll(latestTJ);
-            nonMatchingKY.addAll(latestKY);
 
             // 정렬 (이분탐색용)
             Collections.sort(nonMatchingTJ);

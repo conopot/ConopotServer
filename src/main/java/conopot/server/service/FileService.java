@@ -93,12 +93,39 @@ public class FileService {
 
     // TJ 매칭 안 된 곡들
     public ArrayList<Music> getNonMatchingTJ() throws BaseException {
-        return fileRepository.getNonMatchingTJ();
+        ArrayList<MatchingMusic> matchingMusics = fileRepository.getMatchingMusics();
+
+        ArrayList<Music> ret = new ArrayList<>();
+
+        for(MatchingMusic m : matchingMusics){
+            if(m.getKY().getNumber().equals("?")){
+                ret.add(new Music(m.getTJ().getName(), m.getTJ().getSinger(), m.getTJ().getNumber()));
+            }
+        }
+
+        return ret;
     }
 
     // KY 매칭 안 된 곡들
     public ArrayList<Music> getNonMatchingKY() throws BaseException {
-        return fileRepository.getNonMatchingKY();
+        ArrayList<MatchingMusic> matchingMusics = fileRepository.getMatchingMusics();
+        ArrayList<Music> ky = fileRepository.getKY();
+
+        ArrayList<Music> ret = new ArrayList<>();
+
+        for(Music m : ky){
+            boolean check = false;
+            for(MatchingMusic matching : matchingMusics){
+                if(matching.getKY().getNumber().equals(m.getNumber())){
+                    check = true;
+                    break;
+                }
+            }
+            if(check) continue;
+            ret.add(new Music(m.getName(), m.getSinger(), m.getNumber()));
+        }
+
+        return ret;
     }
 
     // Set MatchingMusics

@@ -42,14 +42,14 @@ public class CrawlingService {
      */
     public void crawlingLatest() throws BaseException, IOException{
         ArrayList<Music> latestTJ = savedLatestTJ();
-        ArrayList<Music> latestKY = savedLatestKY();
+        // ArrayList<Music> latestKY = savedLatestKY();
 
         // TJ 신곡에 대한 가사 크롤링
         crawlingLyrics(latestTJ);
 
         // 신곡 matching 하기
         log.info("Matching Start!");
-        matchingService.matchingMusicByAlgorithm(latestTJ, latestKY);
+        matchingService.matchingMusicByAlgorithm(latestTJ);
     }
 
     /**
