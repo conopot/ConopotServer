@@ -41,8 +41,7 @@ public class ResourceController {
             crawlingService.crawlingLatest();
             crawlingService.crawlingFamous();
             fileService.makeZip(filePath.ZIP_FILE);
-            awsS3Service.uploadZipFile("public/Musics.zip", filePath.DOCKER_MUSICS_ZIP_FILE);
-            awsS3Service.uploadZipFile("public/MatchingFiles.zip", filePath.DOCKER_MATCHINGS_ZIP_FILE);
+            awsS3Service.uploadMusicFiles();
             versionService.savedVersion("SUCCESS");
             mailService.successMailSend();
         } catch(BaseException e){

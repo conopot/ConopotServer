@@ -56,20 +56,20 @@ public class FileRepository {
 
     /**
      * TJ, 금영 전체 곡 가져오기
-     * @param is
+     * @param path
      */
-    public ArrayList<Music> getMusicBook(InputStream is) throws BaseException{
+    public ArrayList<Music> getMusicBookFile(String path) throws BaseException{
 
         ArrayList<Music> ret = new ArrayList<Music>();
 
         try{
-            String UTF8 = "utf8";
-            int BUFFER_SIZE = 8192;
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(is, UTF8), BUFFER_SIZE);
-
+            //파일 객체 생성
+            File file = new File(path);
+            //입력 스트림 생성
+            FileReader file_reader = new FileReader(file);
             int cur = 0, cnt = 0; String name = "", singer = "", number = "", temp = "";
-            while((cur = br.read()) != -1){
+            while((cur = file_reader.read()) != -1){
+
                 char c = (char)cur;
                 if(c == '\n') continue;
                 if(c == '^') {
@@ -91,7 +91,7 @@ public class FileRepository {
                     temp += c;
                 }
             }
-            br.close();
+            file_reader.close();
 
         } catch (FileNotFoundException e) {
             throw new BaseException(FILE_NOTFOUND_ERROR);
@@ -109,20 +109,24 @@ public class FileRepository {
      * @return
      * @throws IOException
      */
-    public ArrayList<MatchingMusic> getMatchingMusics(InputStream is) throws BaseException {
+    public ArrayList<MatchingMusic> getMatchingMusicsFile(String path) throws BaseException {
         ArrayList<MatchingMusic> ret = new ArrayList<>();
 
         try{
-            String UTF8 = "utf8";
-            int BUFFER_SIZE = 8192;
+            String output = "";
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(is, UTF8), BUFFER_SIZE);
+            //파일 객체 생성
+            File file = new File(path);
+            //입력 스트림 생성
+            FileReader file_reader = new FileReader(file);
 
-            int cur = 0, cnt = 0; String name = "", singer = "", number = "", temp = "";
+            int cur = 0, cnt = 0;
+            String temp = "", name = "", singer = "", number = "", sex = "", high = "", numHigh = "";
+
             Music tj = new Music("", "", "");
             Music ky = new Music("", "", "");
 
-            while((cur = br.read()) != -1){
+            while ((cur = file_reader.read()) != -1) {
 
                 char c = (char) cur;
                 if(c == '\n') continue;
@@ -152,7 +156,7 @@ public class FileRepository {
                 }
             }
 
-            br.close();
+            file_reader.close();
 
         } catch (FileNotFoundException e) {
             throw new BaseException(FILE_NOTFOUND_ERROR);
@@ -169,20 +173,23 @@ public class FileRepository {
      * 가수 매칭 파일 가져오기
      * @return
      */
-    public Map<String, String> getMatchingSingersFile(InputStream is) throws BaseException{
+    public Map<String, String> getMatchingSingersFile(String path) throws BaseException{
 
         Map<String, String> ret =new HashMap<>();
 
         try{
-            String UTF8 = "utf8";
-            int BUFFER_SIZE = 8192;
+            String output = "";
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(is, UTF8), BUFFER_SIZE);
-
+            //파일 객체 생성
+            File file = new File(path);
+            //입력 스트림 생성
+            FileReader file_reader = new FileReader(file);
 
             int cur = 0, cnt = 0;
             String temp = "", tj = "", ky = "";
-            while((cur = br.read()) != -1){
+
+            while ((cur = file_reader.read()) != -1) {
+
                 char c = (char) cur;
                 if(c == '\n') continue;
 
@@ -201,7 +208,9 @@ public class FileRepository {
                 }
             }
 
-            br.close();
+            file_reader.close();
+
+
         } catch (FileNotFoundException e) {
             throw new BaseException(FILE_NOTFOUND_ERROR);
         } catch(IOException e){
@@ -272,7 +281,7 @@ public class FileRepository {
             // Legend 파일과 singers 파일 출력
             savedText(changeMusicArr(Legend), "/AllTimeLegend.txt");
             savedText(changeMatchingSingerMap(matchingSingers), "/matchingSingers.txt");
-            String[] matchings = {"AllTimeLegend.txt", "matchingSingers.txt", "nonMatchingKY.txt", "nonMatchingTJ.txt"};
+            String[] matchings = {"AllTimeLegend.txt", "matchingSingers.txt"};
             makeZip("/MatchingFiles.zip", matchings);
 
         } catch(BaseException e){
@@ -359,54 +368,39 @@ public class FileRepository {
 
     public void initData() throws BaseException{
         try {
-            getMusicZipFileFromS3();
+            getMusicFilesFromS3();
             getMatchingZipFileFromS3();
         } catch (BaseException e){
             throw new BaseException(e.getStatus());
         }
     }
 
-    // cloudfront에서 Musics.zip 다운로드 후 init
-    public void getMusicZipFileFromS3() throws BaseException{
+    // cloudfront에서 Musics.zip 관련 파일들 다운로드 후 Init
+    public void getMusicFilesFromS3() throws BaseException{
+
+        String[] fileNames = {"musicbook_TJ.txt", "musicbook_KY.txt", "matching_Musics.txt", "chart_KY.txt"};
+
         try{
-            String fileName = "Musics.zip";
-            String url = cloudFrontUrl + fileName;
+            int cnt = 0;
+            for(String fileName : fileNames){
+                String url = cloudFrontUrl + fileName;
 
+                File file = new File(fileName);
+                FileUtils.copyURLToFile(new URL(url), file);
 
-            File file = new File(fileName);
-            FileUtils.copyURLToFile(new URL(url), file);
-
-            ZipFile zipFile = new ZipFile(file);
-
-            Enumeration<ZipArchiveEntry> entries = zipFile.getEntries();
-
-            //zip 파일 리스트 목록 순환
-            while (entries.hasMoreElements()) {
-                ZipArchiveEntry entry = entries.nextElement();
-                InputStream is = zipFile.getInputStream(entry);
-
-                if(entry.getName().equals("musicbook_TJ.txt")){
-                    this.TJ = getMusicBook(is);
+                if(cnt == 0){
+                    this.TJ = getMusicBookFile("/" + fileName);
+                } else if(cnt == 1){
+                    this.KY = getMusicBookFile("/" + fileName);
+                } else if(cnt == 2){
+                    this.matchingMusics = getMatchingMusicsFile("/" + fileName);
                 }
-                else if(entry.getName().equals("musicbook_KY.txt")){
-                    this.KY = getMusicBook(is);
-                }
-                else if(entry.getName().equals("matching_Musics.txt")){
-                    this.matchingMusics = getMatchingMusics(is);
-                }
-                else continue;
+
+                cnt++;
             }
-            //inputStream close
-            zipFile.close();
-
-        } catch(BaseException e){
-            throw new BaseException(e.getStatus());
-        } catch (MalformedURLException me){
-            me.printStackTrace();
-            throw new BaseException(FILE_CLOUDFRONT_DOWNLOAD_ERROR);
-        } catch (IOException e){
+        } catch(Exception e){
             e.printStackTrace();
-            throw new BaseException(FILE_UNZIP_ERROR);
+            throw new BaseException(FILE_CLOUDFRONT_DOWNLOAD_ERROR);
         }
     }
 
@@ -428,17 +422,13 @@ public class FileRepository {
                 ZipArchiveEntry entry = entries.nextElement();
                 InputStream is = zipFile.getInputStream(entry);
 
+                FileUtils.copyInputStreamToFile(is, new File("/" + entry.getName()));
+
                 if(entry.getName().equals("AllTimeLegend.txt")){
-                    this.Legend = getMusicBook(is);
+                    this.Legend = getMusicBookFile("/AllTimeLegend.txt");
                 }
                 else if(entry.getName().equals("matchingSingers.txt")){
-                    this.matchingSingers = getMatchingSingersFile(is);
-                }
-                else if(entry.getName().equals("nonMatchingTJ.txt")){
-                    this.nonMatchingTJ = getMusicBook(is);
-                }
-                else if(entry.getName().equals("nonMatchingKY.txt")){
-                    this.nonMatchingKY = getMusicBook(is);
+                    this.matchingSingers = getMatchingSingersFile("/matchingSingers.txt");
                 }
                 else continue;
             }

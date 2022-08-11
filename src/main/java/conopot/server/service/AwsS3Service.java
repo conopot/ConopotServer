@@ -37,8 +37,7 @@ public class AwsS3Service {
      * AWS 공식 문서 S3 업로드 코드
      * @throws Exception
      */
-    public void uploadZipFile(String keyName, String path) throws Exception {
-
+    public void uploadFileToS3(String keyName, String path) throws BaseException {
         try {
             TransferManager tm = TransferManagerBuilder.standard()
                     .withS3Client(amazonS3Client)
@@ -52,16 +51,25 @@ public class AwsS3Service {
             // Optionally, wait for the upload to finish before continuing.
             upload.waitForCompletion();
             log.info("Object upload complete");
-        } catch (AmazonServiceException e) {
-            // The call was transmitted successfully, but Amazon S3 couldn't process
-            // it, so it returned an error response.
-            e.printStackTrace();
-            throw new BaseException(FILE_S3_UPLOAD_ERROR);
-        } catch (SdkClientException e) {
-            // Amazon S3 couldn't be contacted for a response, or the client
-            // couldn't parse the response from Amazon S3.
-            e.printStackTrace();
+        } catch (Exception e) {
             throw new BaseException(FILE_S3_UPLOAD_ERROR);
         }
     }
+
+    public void uploadMusicFiles() throws BaseException{
+        try{
+            // Zip 파일 upload
+            uploadFileToS3("public/Musics.zip", filePath.DOCKER_MUSICS_ZIP_FILE);
+            uploadFileToS3("public/MatchingFiles.zip", filePath.DOCKER_MATCHINGS_ZIP_FILE);
+
+            // 다른 파일들 upload
+            uploadFileToS3("public/musicbook_TJ.txt", filePath.DOCKER_MUSICBOOK_TJ_FILE);
+            uploadFileToS3("public/matching_Musics.txt", filePath.DOCKER_MATCHING_MUSICS_FILE);
+
+        } catch (BaseException e){
+            throw new BaseException(e.getStatus());
+        }
+
+    }
+
 }
