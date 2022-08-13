@@ -164,8 +164,7 @@ public class FileService {
     public void makeZip(String path) throws BaseException{
         try{
             fileRepository.makeZipFiles();
-            if(!checkFileSize(filePath.DOCKER_MUSICS_ZIP_FILE,3L*1024) ||
-                    !checkFileSize(filePath.DOCKER_MATCHINGS_ZIP_FILE, 500L)) throw new BaseException(FILE_SIZE_ERROR);
+            if(!checkFileSize(filePath.DOCKER_MUSICS_ZIP_FILE,3L*1024)) throw new BaseException(FILE_SIZE_ERROR);
         } catch (BaseException e) {
             throw new BaseException(e.getStatus());
         }

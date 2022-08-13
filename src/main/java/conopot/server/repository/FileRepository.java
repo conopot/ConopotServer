@@ -272,22 +272,12 @@ public class FileRepository {
     // Musics.zip 파일에 들어가야 되는 파일들 생성
     public void makeZipFiles() throws BaseException{
         try {
-            // highest_Pitch.txt 파일을 받아온다
-            getHighestFileFromS3();
 
             String[] musics = {"musicbook_KY.txt", "musicbook_TJ.txt", "chart_KY.txt", "chart_TJ.txt", "matching_Musics.txt", "highest_Pitch.txt"};
             makeZip("/Musics.zip", musics);
 
-            // Legend 파일과 singers 파일 출력
-            savedText(changeMusicArr(Legend), "/AllTimeLegend.txt");
-            savedText(changeMatchingSingerMap(matchingSingers), "/matchingSingers.txt");
-            String[] matchings = {"AllTimeLegend.txt", "matchingSingers.txt"};
-            makeZip("/MatchingFiles.zip", matchings);
-
         } catch(BaseException e){
             throw new BaseException(e.getStatus());
-        } catch (IOException e){
-            throw new BaseException(FILE_ZIP_ERROR);
         }
     }
 
@@ -368,17 +358,16 @@ public class FileRepository {
 
     public void initData() throws BaseException{
         try {
-            getMusicFilesFromS3();
-            getMatchingZipFileFromS3();
+            getFilesFromS3();
         } catch (BaseException e){
             throw new BaseException(e.getStatus());
         }
     }
 
-    // cloudfront에서 Musics.zip 관련 파일들 다운로드 후 Init
-    public void getMusicFilesFromS3() throws BaseException{
+    // cloudfront에서 관련 파일들 다운로드 후 Init
+    public void getFilesFromS3() throws BaseException{
 
-        String[] fileNames = {"musicbook_TJ.txt", "musicbook_KY.txt", "matching_Musics.txt", "chart_KY.txt"};
+        String[] fileNames = {"musicbook_TJ.txt", "musicbook_KY.txt", "matching_Musics.txt", "AllTimeLegend.txt", "matchingSingers.txt", "chart_KY.txt", "highest_Pitch.txt"};
 
         try{
             int cnt = 0;
@@ -394,6 +383,10 @@ public class FileRepository {
                     this.KY = getMusicBookFile("/" + fileName);
                 } else if(cnt == 2){
                     this.matchingMusics = getMatchingMusicsFile("/" + fileName);
+                } else if(cnt == 3){
+                    this.Legend = getMusicBookFile("/" + fileName);
+                } else if(cnt == 4) {
+                    this.matchingSingers = getMatchingSingersFile("/" + fileName);
                 }
 
                 cnt++;
@@ -404,63 +397,6 @@ public class FileRepository {
         }
     }
 
-    // cloudfront에서 MatchingFiles.zip file 다운로드 후 init
-    public void getMatchingZipFileFromS3() throws BaseException{
-        try{
-            String fileName = "MatchingFiles.zip";
-            String url = cloudFrontUrl + fileName;
 
-            File file = new File(fileName);
-            FileUtils.copyURLToFile(new URL(url), file);
 
-            ZipFile zipFile = new ZipFile(file);
-
-            Enumeration<ZipArchiveEntry> entries = zipFile.getEntries();
-
-            //zip 파일 리스트 목록 순환
-            while (entries.hasMoreElements()) {
-                ZipArchiveEntry entry = entries.nextElement();
-                InputStream is = zipFile.getInputStream(entry);
-
-                FileUtils.copyInputStreamToFile(is, new File("/" + entry.getName()));
-
-                if(entry.getName().equals("AllTimeLegend.txt")){
-                    this.Legend = getMusicBookFile("/AllTimeLegend.txt");
-                }
-                else if(entry.getName().equals("matchingSingers.txt")){
-                    this.matchingSingers = getMatchingSingersFile("/matchingSingers.txt");
-                }
-                else continue;
-            }
-            //inputStream close
-            zipFile.close();
-
-        } catch(BaseException e){
-            throw new BaseException(e.getStatus());
-        } catch (MalformedURLException me){
-            me.printStackTrace();
-            throw new BaseException(FILE_CLOUDFRONT_DOWNLOAD_ERROR);
-        } catch (IOException e){
-            e.printStackTrace();
-            throw new BaseException(FILE_UNZIP_ERROR);
-        }
-    }
-
-    // cloudfront에서 highest_Pitch file 다운로드 후 init
-    public void getHighestFileFromS3() throws BaseException{
-        try{
-            String fileName = "highest_Pitch.txt";
-            String url = cloudFrontUrl + fileName;
-
-            File file = new File(fileName);
-            FileUtils.copyURLToFile(new URL(url), file);
-
-        } catch (MalformedURLException me){
-            me.printStackTrace();
-            throw new BaseException(FILE_CLOUDFRONT_DOWNLOAD_ERROR);
-        } catch (IOException e){
-            e.printStackTrace();
-            throw new BaseException(FILE_UNZIP_ERROR);
-        }
-    }
 }
