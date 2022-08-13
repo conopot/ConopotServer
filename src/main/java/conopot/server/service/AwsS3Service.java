@@ -46,11 +46,11 @@ public class AwsS3Service {
             // TransferManager processes all transfers asynchronously,
             // so this call returns immediately.
             Upload upload = tm.upload(bucket, keyName, new File(path));
-            log.info("Object upload started");
+            log.info("{} upload started", keyName);
 
             // Optionally, wait for the upload to finish before continuing.
             upload.waitForCompletion();
-            log.info("Object upload complete");
+            log.info("{} upload complete", keyName);
         } catch (Exception e) {
             throw new BaseException(FILE_S3_UPLOAD_ERROR);
         }
