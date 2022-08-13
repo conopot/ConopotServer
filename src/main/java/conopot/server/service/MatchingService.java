@@ -47,6 +47,9 @@ public class MatchingService {
             // Legend 곡 들 앞으로 빼주기
             legendToFront(matchingMusics);
 
+            // 파일들 내보내기
+            fileService.savedText(fileService.changeMatchingMusicArr(matchingMusics), "/matching_Musics.txt");
+
         } catch(BaseException e){
             throw new BaseException(e.getStatus());
         }
