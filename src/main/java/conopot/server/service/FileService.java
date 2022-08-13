@@ -25,11 +25,13 @@ public class FileService {
 
     private final FileRepository fileRepository;
     private FilePath filePath;
+    private boolean[] checkMatchingKY;
 
     @Autowired
     public FileService(FileRepository fileRepository) {
         this.fileRepository = fileRepository;
         this.filePath = new FilePath();
+        this.checkMatchingKY = new boolean[100001];
     }
 
     /**
@@ -113,15 +115,15 @@ public class FileService {
 
         ArrayList<Music> ret = new ArrayList<>();
 
-        for(Music m : ky){
-            boolean check = false;
-            for(MatchingMusic matching : matchingMusics){
-                if(matching.getKY().getNumber().equals(m.getNumber())){
-                    check = true;
-                    break;
-                }
+        for(MatchingMusic matchingMusic : matchingMusics){
+            String number = matchingMusic.getKY().getNumber();
+            if(!number.equals("?")){
+                checkMatchingKY[Integer.valueOf(number)] = true;
             }
-            if(check) continue;
+        }
+
+        for(Music m : ky){
+            if(checkMatchingKY[Integer.valueOf(m.getNumber())]) continue;
             ret.add(new Music(m.getName(), m.getSinger(), m.getNumber()));
         }
 
