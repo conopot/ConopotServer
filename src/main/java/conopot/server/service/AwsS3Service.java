@@ -60,7 +60,6 @@ public class AwsS3Service {
         try{
             // Zip 파일 upload
             uploadFileToS3("public/Musics.zip", filePath.DOCKER_MUSICS_ZIP_FILE);
-            uploadFileToS3("public/MatchingFiles.zip", filePath.DOCKER_MATCHINGS_ZIP_FILE);
 
             // 다른 파일들 upload
             uploadFileToS3("public/musicbook_TJ.txt", filePath.DOCKER_MUSICBOOK_TJ_FILE);

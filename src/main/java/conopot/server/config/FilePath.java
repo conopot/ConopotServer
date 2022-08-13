@@ -27,7 +27,7 @@ public class FilePath {
     public String ZIP_FILE = "src/main/resources/static/MusicDB/";
     public String S3_ZIP_FILE = "src/main/resources/static/MusicDB/Musics.zip";
     public String DOCKER_MUSICS_ZIP_FILE = "/Musics.zip";
-    public String DOCKER_MATCHINGS_ZIP_FILE = "/MatchingFiles.zip";
+    // public String DOCKER_MATCHINGS_ZIP_FILE = "/MatchingFiles.zip";
     public String DOCKER_MUSICBOOK_TJ_FILE = "/musicbook_TJ.txt";
     public String DOCKER_MATCHING_MUSICS_FILE = "/matching_Musics.txt";
 
