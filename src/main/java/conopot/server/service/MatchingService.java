@@ -49,8 +49,6 @@ public class MatchingService {
 
             // 파일들 내보내기
             fileService.savedText(fileService.changeMatchingMusicArr(matchingMusics), "/matching_Musics.txt");
-            fileService.savedText(fileService.changeMusicArr(nonMatchingTJ), "/nonMatchingTJ.txt");
-            fileService.savedText(fileService.changeMusicArr(nonMatchingKY), "/nonMatchingKY.txt");
 
         } catch(BaseException e){
             throw new BaseException(e.getStatus());
