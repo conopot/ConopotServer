@@ -59,7 +59,6 @@ public class MailService {
             mailHelper.setSubject("코노팟 음악 데이터 갱신 성공 알림");
             mailHelper.setText("이번 주에도 무사히 음악 데이터 갱신을 완료했습니다^^");
             mailHelper.addAttachment("Musics.zip", new File(filePath.DOCKER_MUSICS_ZIP_FILE));
-            mailHelper.addAttachment("MatchingFiles.zip", new File(filePath.DOCKER_MATCHINGS_ZIP_FILE));
 
             mailSender.send(mail);
             log.info("성공 메일을 성공적으로 전송하였습니다.");
