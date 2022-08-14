@@ -21,7 +21,7 @@ public class VersionRepository {
 
     public void savedVersion(String date, String status) throws BaseException{
         try{
-            String query = "INSERT VERSION VALUES (?, ?)";
+            String query = "INSERT VERSION VALUES (0, ?, ?)";
             Object[] param = new Object[]{date, status};
             this.jdbcTemplate.update(query, param);
         } catch(Exception e){
