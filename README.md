@@ -1,3 +1,2 @@
 # ⚙️ Architecture
-
-<img width="1064" alt="ServerArchitecture" src="https://user-images.githubusercontent.com/65909160/184590086-d1163f89-eb6d-4e98-a37f-df31d833b181.png">
+<img width="1200" alt="image" src="https://user-images.githubusercontent.com/65909160/185732791-749a1e76-e718-4fe7-961c-8da5bcba896b.png">
