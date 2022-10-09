@@ -66,7 +66,7 @@ public class CrawlingService {
         try{
             for(Music m : latestTJ) {
                 if(lyricsRepository.checkAlreadyLyricsTJ(m.getNumber()) > 0) continue; // 이미 크롤링 했다면 건너뛰기
-                crawlingLyricByNumberTJ(m.getNumber());
+                crawlingLyricByNumberTJ(m);
             }
         } catch (BaseException e){
             throw new BaseException(e.getStatus());
@@ -75,16 +75,17 @@ public class CrawlingService {
 
     /**
      * TJ 한 곡에 대한 가사 크롤링
-     * @param number
      * @return
      */
-    public boolean crawlingLyricByNumberTJ(String number) throws BaseException{
+    public boolean crawlingLyricByNumberTJ(Music m) throws BaseException{
 
+        String number = m.getNumber();
         String lyrics = "";
 
         // crawling logic
         Connection conn = Jsoup.connect("https://www.tjmedia.co.kr/2006_renew/ZillerGasaService/gasa_view2.asp?pro=" + number);
 
+        boolean melonFlag = false;
         try {
             Document document = conn.get();
 
@@ -97,10 +98,27 @@ public class CrawlingService {
             lyrics = lyrics.replaceAll("(<pre>|</pre>)", "");
 
         } catch (Exception e) {
-            return false; // TJ는 가사가 없는 것들도 있기 때문에 continue 해주어야 한다.
+            // TJ는 가사가 없는 것들도 있기 때문에 continue 해주어야 한다.
             // throw new BaseException(CRAWL_LYRICS_TJ_ERROR);
+            melonFlag = true;
         }
 
+        // 크롤링은 성공했으나 가사가 없다면
+        if(lyrics.equals("")) melonFlag = true;
+
+        // TJ 가사 크롤링에 실패했다면, melon에서 추가적으로 크롤링하기
+        if(melonFlag){
+            try{
+                String melonNumber = crawlMelonMusicNumber(m.getName(), m.getSinger());
+                if(melonNumber.equals("")) return true;
+                String lyric = crawlMelonLyrics(melonNumber);
+                if(lyric.equals("")) return true;
+                lyricsRepository.saveLyricsTJ(m.getNumber(), lyric);
+            } catch(Exception e) {
+                // e.printStackTrace();
+                log.info("TJ 가사 크롤링 실패 후 멜론 가사 크롤링도 실패했습니다.");
+            }
+        }
         // 결과값 DB에 저장하기
         lyricsRepository.saveLyricsTJ(number, lyrics);
 
@@ -215,6 +233,76 @@ public class CrawlingService {
         }
 
         log.info("KY Latest Before Size : {}", ret.size());
+
+        return ret;
+    }
+
+    /**
+     * Melon 음악 번호 크롤링
+     * @param name
+     * @param singer
+     * @return
+     */
+    public String crawlMelonMusicNumber(String name, String singer){
+        String url = "https://www.melon.com/search/song/index.htm?q=" + name + "+" + singer;
+        Connection conn = Jsoup.connect(url);
+
+        String num = "";
+
+        try {
+            Document document = conn.get();
+            Elements elements = document.select("div.ellipsis a");
+
+            String nextUrl = elements.attr("href");
+            // System.out.println(nextUrl);
+
+            if(nextUrl.equals("")) return "";
+
+            boolean check = false;
+            for(int i=nextUrl.length() - 1; i>=0; i--){
+                if(nextUrl.charAt(i) == '\'') {
+                    if(check == true) break;
+                    check = true;
+                    continue;
+                }
+                if(check){
+                    num = nextUrl.charAt(i) + num;
+                }
+            }
+
+            // System.out.println(num);
+        } catch (IOException e) {
+            log.info("해당 노래를 멜론에서 검색할 수 없습니다.");
+            // e.printStackTrace();
+        }
+
+        return num;
+    }
+
+    /**
+     * Melon 가사 크롤링
+     * @param melonNumber
+     * @return
+     */
+    public String crawlMelonLyrics(String melonNumber){
+        String url = "https://www.melon.com/song/detail.htm?songId=" + melonNumber;
+        Connection conn = Jsoup.connect(url);
+
+        String ret = "";
+
+        try {
+            Document document = conn.get();
+            document.select("br").append("\\n");
+            Elements elements = document.select("div.lyric");
+
+            ret = elements.text();
+            ret = ret.replace("\\n", "\n");
+            // System.out.println(str); // 가사 부분임 -> 이걸 DB에 저장하게 하기
+
+        } catch (IOException e) {
+            log.info("멜론 가사를 크롤링하는데 실패했습니다.");
+            // e.printStackTrace();
+        }
 
         return ret;
     }

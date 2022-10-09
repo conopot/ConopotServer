@@ -51,14 +51,4 @@ public class ResourceController {
         }
         return new BaseResponse<>(SUCCESS);
     }
-
-    @GetMapping("/music/crawling")
-    public BaseResponse<String> crawlingMusics() throws Exception {
-        try {
-            crawlingService.crawlingLyricByNumberTJ("4");
-        } catch(BaseException e) {
-            return new BaseResponse<>(e.getStatus());
-        }
-        return new BaseResponse<>(SUCCESS);
-    }
 }
