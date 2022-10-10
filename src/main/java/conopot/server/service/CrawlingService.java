@@ -24,18 +24,20 @@ public class CrawlingService {
     private final FileService fileService;
     private final LyricsRepository lyricsRepository;
     private final MatchingService matchingService;
+    private final AwsDynamoDbService awsDynamoDbService;
     private FilePath filePath;
     boolean checkTJ[] = new boolean[100001];
     boolean checkKY[] = new boolean[100001];
 
     @Autowired
-    public CrawlingService(FileService fileService, LyricsRepository lyricsRepository, MatchingService matchingService) {
+    public CrawlingService(FileService fileService, LyricsRepository lyricsRepository, MatchingService matchingService, AwsDynamoDbService awsDynamoDbService) {
         this.fileService = fileService;
         this.lyricsRepository = lyricsRepository;
         this.matchingService = matchingService;
+        this.awsDynamoDbService = awsDynamoDbService;
         this.filePath = new FilePath();
-        // WebDriverManager.chromedriver().setup(); // chrome driver download
     }
+
 
     /**
      * 이번에 새롭게 추가된 최신곡들 저장
@@ -118,6 +120,7 @@ public class CrawlingService {
                 log.info("TJ 가사 크롤링 실패 후 멜론 가사 크롤링도 실패했습니다.");
             }
         }
+
         // 결과값 DB에 저장하기
         lyricsRepository.saveLyricsTJ(number, lyrics);
 
@@ -126,7 +129,7 @@ public class CrawlingService {
         lyrics = lyrics.replaceAll("[\\\\'\"\t{}().,?!\\[\\]\\/\\-\\+\\^@#$%&*<>~`_]", " ");
 
         // Dynamo DB에 가사 데이터 넣기
-
+        awsDynamoDbService.createItem(m.getNumber(), lyrics);
 
         return true;
     }

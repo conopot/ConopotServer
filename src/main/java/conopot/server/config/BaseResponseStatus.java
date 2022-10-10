@@ -32,6 +32,7 @@ public enum BaseResponseStatus {
     FAIL_MAIL_SEND_ERROR(false, 4004, "API 실패 메일을 전송하는데 실패하였습니다."),
     SUCCESS_MAIL_SEND_ERROR(false, 4005, "API 성공 전송하는데 실패하였습니다."),
     DATABASE_VERSION_SAVED_ERROR(false, 4006, "API 호출 결과를 저장하는데 실패하였습니다."),
+    AWS_DYNAMODB_ERROR(false, 4007, "Dynamo DB에 가사 추가를 실패하였습니다."),
 
     /**
      * 5000 : File I/O 오류

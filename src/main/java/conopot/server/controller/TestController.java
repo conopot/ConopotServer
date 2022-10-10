@@ -29,9 +29,11 @@ public class TestController{
     private final MailService mailService;
     private final FileRepository fileRepository;
     private final VersionService versionService;
+    private final AwsDynamoDbService awsDynamoDbService;
     private FilePath filePath;
 
-    public TestController(FileService fileService, CrawlingService crawlingService, MatchingService matchingService, AwsS3Service awsS3Service, MailService mailService, FileRepository fileRepository, VersionService versionService) {
+    @Autowired
+    public TestController(FileService fileService, CrawlingService crawlingService, MatchingService matchingService, AwsS3Service awsS3Service, MailService mailService, FileRepository fileRepository, VersionService versionService, AwsDynamoDbService awsDynamoDbService) {
         this.fileService = fileService;
         this.crawlingService = crawlingService;
         this.matchingService = matchingService;
@@ -39,6 +41,7 @@ public class TestController{
         this.mailService = mailService;
         this.fileRepository = fileRepository;
         this.versionService = versionService;
+        this.awsDynamoDbService = awsDynamoDbService;
         filePath = new FilePath();
     }
 
@@ -158,4 +161,12 @@ public class TestController{
         }
     }
 
+    @GetMapping("/testDynamo")
+    public void testDynamoDB(){
+        try{
+            awsDynamoDbService.createItem("100003", "test3");
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 }
