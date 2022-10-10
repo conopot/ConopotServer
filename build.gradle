@@ -24,6 +24,7 @@ dependencies {
 	implementation 'org.jsoup:jsoup:1.15.1'
 	implementation platform('com.amazonaws:aws-java-sdk-bom:1.11.1000')
 	implementation 'com.amazonaws:aws-java-sdk-s3'
+	implementation 'com.amazonaws:aws-java-sdk-dynamodb'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'commons-io:commons-io:2.11.0'
 	implementation 'org.apache.commons:commons-compress:1.21'

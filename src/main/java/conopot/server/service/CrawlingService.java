@@ -121,6 +121,13 @@ public class CrawlingService {
         // 결과값 DB에 저장하기
         lyricsRepository.saveLyricsTJ(number, lyrics);
 
+        // 가사에서 특수문자 제거
+        lyrics = lyrics.replaceAll("\n", " ");
+        lyrics = lyrics.replaceAll("[\\\\'\"\t{}().,?!\\[\\]\\/\\-\\+\\^@#$%&*<>~`_]", " ");
+
+        // Dynamo DB에 가사 데이터 넣기
+
+
         return true;
     }
 
