@@ -113,7 +113,6 @@ public class CrawlingService {
                 if(melonNumber.equals("")) return true;
                 String lyric = crawlMelonLyrics(melonNumber);
                 if(lyric.equals("")) return true;
-                lyricsRepository.saveLyricsTJ(m.getNumber(), lyric);
             } catch(Exception e) {
                 // e.printStackTrace();
                 log.info("TJ 가사 크롤링 실패 후 멜론 가사 크롤링도 실패했습니다.");
